@@ -29,7 +29,7 @@ server.listen(0, async () => {
   check('main content visible after unlock', d.getElementById('mainContent').style.display==='block');
 
   // 2. floating emojis + nectar bees spawned
-  check('floating emojis spawned (>0)', d.querySelectorAll('.floating-emoji').length>0);
+  check("floating emojis spawned (>0)", d.querySelectorAll(".floating-emoji").length>0);
   check('nectar bees use .nectar-bee class', d.querySelectorAll('.nectar-bee').length>=6);
 
   // 3. no BDSM markup survived the cleanup
@@ -42,6 +42,14 @@ server.listen(0, async () => {
   check('both signature imgs are on Sign: lines', signImgs.every(i => i.classList.contains('sign-inline-img') && i.closest('.signature-box')));
   check('deep sign uses correct asset', signImgs.some(i => i.getAttribute('src') === 'assets/deep-signature.png'));
   check('honey sign asset present', signImgs.some(i => i.getAttribute('src') === 'assets/honey-signature.png'));
+
+  // 3c. Soulmate logo is in its correct place and every referenced asset exists
+  const soul = d.getElementById('soulmateImage');
+  check('soulmate logo uses assets/soulmate-logo.png', soul && soul.getAttribute('src') === 'assets/soulmate-logo.png');
+  const missingAssets = Array.from(d.querySelectorAll('img'))
+    .map(i => i.getAttribute('src') || '')
+    .filter(s => s.startsWith('assets/') && !fs.existsSync(path.join(__dirname, s)));
+  check('no img references a missing asset file', missingAssets.length === 0);
 
   // 4. complaint subjects per partner (HTML preview)
   // switch to HTML email format first (radio drives sendComplaint branch)
