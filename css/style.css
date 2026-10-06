@@ -1993,3 +1993,105 @@ body { font-family: Georgia, 'Palatino Linotype', 'Book Antiqua', 'Times New Rom
 @media (prefers-reduced-motion: reduce) {
   .floating-emoji, .nectar-bee { display: none !important; }
 }
+
+/* ============================================================
+   LATEST REQUESTED UPDATES (final overrides — these win)
+   ============================================================ */
+
+/* 1) SECURITY: the real password must NEVER be visible anywhere.
+      Belt-and-braces rule so even an old cached page hides it. */
+.password-footer span[style*="Password"],
+span[class*="password-reveal"] { display: none !important; }
+
+/* 2) PHONE COMPATIBILITY — background animation visible through the cards:
+      make the main boxes ~95% transparent on phones/tablets and drop the
+      heavy blur so the floating hearts show through clearly + stay smooth. */
+@media only screen and (max-width: 768px) {
+  .email-container,
+  .section,
+  .soulmate-section,
+  .response-system-container,
+  .promise-box,
+  .signature-section,
+  .contract-title,
+  .intro-text,
+  .header,
+  .footer,
+  .html-email-preview,
+  .message-box,
+  .email-list,
+  .deepnectar-box,
+  .deepnectar-middle {
+    background-color: rgba(255, 252, 253, 0.05) !important; /* 95% transparent */
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+  .rule-content,
+  .special-note,
+  .response-option {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+  /* keep text readable over the animated background */
+  .email-container, .section, .soulmate-section, .response-system-container,
+  .promise-box, .header, .footer { text-shadow: 0 1px 4px rgba(255,255,255,0.9); }
+}
+
+/* 3) BIGGER soulmate image in the "Our Eternal Soulmate Code" section */
+.soulmate-image-container { width: 300px; height: 260px; }
+@media only screen and (max-width: 768px) { .soulmate-image-container { width: 280px; height: 240px; } }
+@media only screen and (max-width: 480px) { .soulmate-image-container { width: 250px; height: 215px; } }
+@media only screen and (max-width: 360px) { .soulmate-image-container { width: 210px; height: 180px; } }
+
+/* 4) ALL action buttons stay INSIDE their box on phones
+      (format toggles + complaint buttons can no longer overflow). */
+@media only screen and (max-width: 768px) {
+  .response-system-container, .section, .email-container { overflow-x: hidden; }
+  .email-format-toggle {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-left: 0;
+    margin-right: 0;
+    gap: 8px;
+  }
+  .email-format-toggle label {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    text-align: center;
+    box-sizing: border-box;
+  }
+  .complaint-buttons {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    padding: 0 2px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .complaint-btn {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+}
+@media only screen and (max-width: 480px) {
+  .email-format-toggle { flex-direction: column; }
+  .email-format-toggle label { flex: 1 1 100%; width: 100%; font-size: 13px; padding: 8px 10px; }
+  .complaint-btn { font-size: 13.5px; padding: 13px 10px; }
+}
+
+/* Extra safety: format-toggle pills can never exceed their container width */
+.email-format-toggle label { max-width: 100%; box-sizing: border-box; overflow-wrap: anywhere; }
+.complaint-btn { max-width: 100%; box-sizing: border-box; }
