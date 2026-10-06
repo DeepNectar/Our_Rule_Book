@@ -40,7 +40,8 @@
           error.innerHTML = '❌ Wrong password 3 times! Hint: "Our pet name + @ + the Date & Month we met + @" 💕';
         }
         if (attempts >= 5) {
-          error.innerHTML = '❌ The password is <strong>Deepnectar@1612@</strong> 😘';
+          /* SECURITY: never reveal the real password on screen — keep hint only */
+          error.innerHTML = '❌ Wrong password 5 times! Hint: "Our pet name + @ + the Date &amp; Month we met + @" 💕';
         }
       }
     }
