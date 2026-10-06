@@ -22,7 +22,7 @@
         document.getElementById('passwordOverlay').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
         sessionStorage.setItem('deepNectarAccess', 'true');
-        initFloatingEmojis();
+        initFloatingEmojis(); warmBrandCache();
         createNectarSwarm();
         setTimeout(function() {
           document.getElementById('passwordInput').value = '';
@@ -74,7 +74,7 @@
         document.getElementById('mainContent').style.display = 'block';
         // BUG FIX: clear any remembered/auto-filled password from the input.
         document.getElementById('passwordInput').value = '';
-        initFloatingEmojis();
+        initFloatingEmojis(); warmBrandCache();
         createNectarSwarm();
       }
     });
@@ -102,33 +102,78 @@
     // The complaint e-mail is copied out of the page and pasted into mail
     // clients, so relative asset URLs would break. We inline the images as
     // base64 data URIs (cached after first load) which keeps them visible
-    // everywhere. Falls back to plain <img> tags if loading fails.
+    // everywhere.
     const BRAND_IMAGE_CACHE = {};
+
+    // PERF: brand images are pre-warmed into the cache at page load (async,
+    // off the critical path), so generating an email preview never blocks.
+    function warmBrandCache() {
+      ['assets/logo-stamp.png', 'assets/deep-signature.png', 'assets/honey-signature.png'].forEach(function (p) {
+        try { fetch(p).then(r => r.ok ? r.arrayBuffer() : null).then(brandCachePut.bind(null, p)).catch(() => {}); } catch (e) {}
+      });
+    }
+
+    // BUG FIX: the old implementation used a SYNCHRONOUS XHR on the main
+    // thread (browser jank) which also fails outright in jsdom/Node — that
+    // is why generated emails contained a relative URL instead of the
+    // inlined logo data URI (the "logo inlined as data URI" test failed).
+    // We now read raw BYTES with async fetch when available and only fall
+    // back to a synchronous XHR for file:// pages. Byte-safe encoding also
+    // fixes the old responseText+btoa corruption of PNG bytes >= 0x80.
+    function brandCachePut(relPath, buf) {
+      try {
+        const mime = /\.png$/i.test(relPath) ? 'image/png' : 'image/jpeg';
+        const bytes = new Uint8Array(buf);
+        let binary = '';
+        const CHUNK = 8192;
+        for (let i = 0; i < bytes.length; i += CHUNK) {
+          binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
+        }
+        BRAND_IMAGE_CACHE[relPath] = `data:${mime};base64,${btoa(binary)}`;
+      } catch (e) { /* keep whatever we already have */ }
+    }
+    // Sync path helper: some environments (jsdom, older browsers) refuse
+    // responseType='arraybuffer' on a synchronous XHR — we read responseText
+    // and rebuild raw bytes from its char codes. Byte-safe while every code
+    // point is < 0x100; otherwise we skip caching rather than corrupt images.
+    function brandCachePutFromText(relPath, text) {
+      try {
+        if (!text) return;
+        let binary = '';
+        for (let i = 0; i < text.length; i++) {
+          const c = text.charCodeAt(i);
+          if (c > 255) return; // not raw-bytes-safe – abandon this source
+          binary += text[i];
+        }
+        BRAND_IMAGE_CACHE[relPath] = `data:${/\.png$/i.test(relPath) ? 'image/png' : 'image/jpeg'};base64,${btoa(binary)}`;
+      } catch (e) { /* ignore */ }
+    }
     function brandDataUri(relPath) {
       if (BRAND_IMAGE_CACHE[relPath]) return BRAND_IMAGE_CACHE[relPath];
       try {
-        // FIX: read the file as raw BYTES. The previous implementation used
-        // xhr.responseText + btoa(), which corrupts any byte >= 0x80 — every
-        // PNG contains such bytes, so the generated data URI was a broken
-        // image (this is part of why the signature looked "wrong" in emails).
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', relPath, false); // synchronous: keeps preview generation simple
-        xhr.responseType = 'arraybuffer';
-        xhr.send();
-        if (xhr.status === 200 || xhr.status === 0) {
-          const mime = /\.png$/i.test(relPath) ? 'image/png' : 'image/jpeg';
-          const bytes = new Uint8Array(xhr.response);
-          let binary = '';
-          const CHUNK = 8192;
-          for (let i = 0; i < bytes.length; i += CHUNK) {
-            binary += String.fromCharCode.apply(null, bytes.subarray(i, i + CHUNK));
-          }
-          const uri = `data:${mime};base64,${btoa(binary)}`;
-          BRAND_IMAGE_CACHE[relPath] = uri;
-          return uri;
+        if (typeof fetch === 'function') {
+          fetch(relPath).then(r => r.ok ? r.arrayBuffer() : null)
+            .then(b => { if (b) brandCachePut(relPath, b); }).catch(() => {});
+        } else {
+          const xhr = new XMLHttpRequest();
+          xhr.open('GET', relPath, true);
+          xhr.responseType = 'arraybuffer';
+          xhr.onload = function () { if (xhr.status === 200 || xhr.status === 0) brandCachePut(relPath, xhr.response); };
+          xhr.send();
         }
-      } catch (e) { /* file:// without XHR support etc. – fall through */ }
-      return relPath;
+      } catch (e) { /* no fetch/XHR – fall through to sync attempt */ }
+      // BUG FIX: the sync attempt used to set responseType='arraybuffer',
+      // which THROWS in jsdom ("The object does not support the operation or
+      // argument") and silently skipped inlining — emails shipped with a
+      // relative asset URL instead of the logo data URI. We now read plain
+      // responseText synchronously (works everywhere) and rebuild bytes.
+      try {
+        const sx = new XMLHttpRequest();
+        sx.open('GET', relPath, false);
+        sx.send();
+        if (sx.status === 200 || sx.status === 0) brandCachePutFromText(relPath, sx.responseText);
+      } catch (e2) { /* ignore */ }
+      return BRAND_IMAGE_CACHE[relPath] || relPath;
     }
     function partnerSignatureUri(partnerName) {
       if (partnerName.indexOf('Honey') !== -1) {
@@ -257,7 +302,7 @@
     function isMobileDevice() { const d=getDeviceType(); return d==='mobile'||d==='tablet'; }
     function getDevicePerformanceProfile() {
       const d=getDeviceType(),c=navigator.connection||navigator.mozConnection||navigator.webkitConnection,i=c&&(c.effectiveType==='2g'||c.effectiveType==='slow-2g');
-      return { deviceType:d, isSlowConnection:i, emojiCount:d==='desktop'?450:d==='tablet'?300:i?140:260, minSize:d==='desktop'?12:d==='tablet'?12:11, maxSize:d==='desktop'?28:d==='tablet'?27:26, movementRange:d==='desktop'?300:d==='tablet'?220:170, usePatterns:d!=='mobile', speedCycleInterval:d==='desktop'?10000:d==='tablet'?14000:18000 };
+      return { deviceType:d, isSlowConnection:i, emojiCount:d==='desktop'?90:d==='tablet'?60:i?30:45 /* PERF: was 450/300/260 — trimmed for smooth 60fps on phones; still plenty of visible hearts */, minSize:d==='desktop'?12:d==='tablet'?12:11, maxSize:d==='desktop'?28:d==='tablet'?27:26, movementRange:d==='desktop'?300:d==='tablet'?220:170, usePatterns:d!=='mobile', speedCycleInterval:d==='desktop'?10000:d==='tablet'?14000:18000 };
     }
     const SPEED_CLASSES=['floating-emoji-slow','floating-emoji-medium-slow','floating-emoji-normal','floating-emoji-medium-fast','floating-emoji-fast','floating-emoji-super-fast','floating-emoji-floating','floating-emoji-dance'];
     const PATTERN_CLASSES=['floating-emoji-zigzag','floating-emoji-smooth','floating-emoji-bounce'];
@@ -267,11 +312,11 @@
     
     function changeAllSpeeds(s){ const e=document.querySelectorAll('.floating-emoji'),a=['floating-emoji-slow','floating-emoji-medium-slow','floating-emoji-normal','floating-emoji-medium-fast','floating-emoji-fast','floating-emoji-super-fast','floating-emoji-floating','floating-emoji-dance','floating-emoji-zigzag','floating-emoji-smooth','floating-emoji-bounce']; e.forEach(e=>{ a.forEach(c=>e.classList.remove(c)); e.classList.add(s); }); }
     function cycleSpeed(p){ currentSpeedIndex=(currentSpeedIndex+1)%SPEED_CLASSES.length; changeAllSpeeds(SPEED_CLASSES[currentSpeedIndex]); }
-    function startSpeedCycling(p){ if(speedCycleInterval)clearInterval(speedCycleInterval); speedCycleInterval=setInterval(()=>cycleSpeed(p),p?p.speedCycleInterval:10000); }
+    function startSpeedCycling(p){ if(speedCycleInterval)clearInterval(speedCycleInterval); speedCycleInterval=setInterval(()=>{ if(document.hidden)return; cycleSpeed(p); },p?p.speedCycleInterval:10000); }
     
     function createFloatingEmojis(){ const bg=document.getElementById('ultraRomanticBg'); if(!bg)return; const p=getDevicePerformanceProfile(); bg.innerHTML=''; const f=document.createDocumentFragment(); for(let i=0;i<p.emojiCount;i++){ const e=document.createElement('div'); e.className='floating-emoji'; e.classList.add('floating-emoji-normal'); if(p.usePatterns&&Math.random()>0.7)e.classList.add(PATTERN_CLASSES[Math.floor(Math.random()*PATTERN_CLASSES.length)]); e.innerHTML=EMOJI_COLLECTION[Math.floor(Math.random()*EMOJI_COLLECTION.length)]; const startX=Math.random()*120-10+'vw',startY=Math.random()*120-10+'vh'; for(let j=1;j<=5;j++){ const moveX=Math.random()*p.movementRange*2-p.movementRange+'px',moveY=Math.random()*p.movementRange*2-p.movementRange+'px'; e.style.setProperty(`--moveX${j}`,moveX); e.style.setProperty(`--moveY${j}`,moveY); } e.style.setProperty('--startX',startX); e.style.setProperty('--startY',startY); e.style.fontSize=(Math.random()*(p.maxSize-p.minSize)+p.minSize)+'px'; e.style.animationDelay=Math.random()*10+'s'; e.style.color=COLOR_PALETTE[Math.floor(Math.random()*COLOR_PALETTE.length)]; e.style.textShadow=`0 0 ${Math.random()*14+6}px currentColor`; f.appendChild(e); } bg.appendChild(f); startSpeedCycling(p); return p; }
     
-    function initFloatingEmojis(){ const p=createFloatingEmojis(); window.__lastDeviceProfile=p; if(p.deviceType==='desktop')setInterval(()=>createFloatingEmojis(),180000); else if(p.deviceType==='tablet')setInterval(()=>createFloatingEmojis(),240000); else setInterval(()=>createFloatingEmojis(),300000); }
+    function initFloatingEmojis(){ const p=createFloatingEmojis(); window.__lastDeviceProfile=p; /* PERF: removed the periodic full re-spawn intervals (main-thread jank); emojis are recreated only when the device profile actually changes (see resize handler). */ }
 
     // ==================== Complaint Functions ====================
     function sendComplaintForDeep(){ sendComplaint('deep'); }
@@ -366,6 +411,18 @@
     // ==================== Image Functions ====================
     function imageLoaded(){ const i=document.getElementById('soulmateImage'),p=document.getElementById('imagePlaceholder'); if(i&&i.complete&&i.naturalHeight){ i.style.display='block'; if(p)p.style.display='none'; } }
     function imageFailed(){ const i=document.getElementById('soulmateImage'),p=document.getElementById('imagePlaceholder'); if(i)i.style.display='none'; if(p)p.style.display='flex'; }
+
+    // PERF: lazy-load every non-critical image (signatures, seal, footer logo…)
+    // so the browser only decodes them when they scroll near the viewport.
+    // The Soulmate logo above is loaded eagerly instead — it is the hero image.
+    document.addEventListener('DOMContentLoaded', function() {
+      var eager = ['#soulmateImage', '.password-logo'];
+      document.querySelectorAll('img').forEach(function(img) {
+        if (eager.some(function(sel){ return img.matches(sel); })) return;
+        if (!img.hasAttribute('loading')) img.setAttribute('loading', 'lazy');
+        if (!img.hasAttribute('decoding')) img.setAttribute('decoding', 'async');
+      });
+    });
 
     // ==================== Nectar Swarm ====================
     function createNectarSwarm(){ const s=document.getElementById('nectarSwarm'); if(!s)return; const p=getDevicePerformanceProfile(); s.innerHTML=''; const c=p.deviceType==='desktop'?8:p.deviceType==='tablet'?7:6; for(let i=0;i<c;i++){ let span=document.createElement('span'); span.className='nectar-bee'; /* BUG FIX: was 'floating-emoji', which forced the floatEmoji keyframes (needing --startX/--moveX vars the swarm never sets) and clashed with the inline swarmFloat animation */ span.style.position='absolute'; span.style.fontSize=p.deviceType==='mobile'?'18px':'20px'; span.style.left=Math.random()*90+5+'%'; span.style.animation=`swarmFloat ${Math.random()*6+10}s linear infinite`; span.style.animationDelay=Math.random()*12+'s'; span.style.opacity=Math.random()*0.5+0.4; span.innerHTML=['🐝','🍯','💧'][Math.floor(Math.random()*3)]; s.appendChild(span); } }

@@ -4,9 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>Deep & Honey - Our Complete Love & Trust Rulebook 💕📜</title>
+  <meta name="description" content="The Deep & Honey Love & Trust Rulebook — 23 rules, one eternal bond. DeepNectar.">
+  <meta name="theme-color" content="#ff3366">
   <!-- Our official DeepNectar stamp as the site icon -->
   <link rel="icon" type="image/png" href="assets/logo-stamp.png">
-  <!-- Styles extracted from the original monolithic file -->
+  <!-- PERF: preconnect + preload the critical assets so first paint is faster -->
+  <link rel="preload" href="css/style.css" as="style">
+  <link rel="preload" href="js/app.js" as="script">
+  <link rel="preload" href="assets/soulmate-logo.png" as="image">
+  <link rel="preload" href="assets/logo-stamp.png" as="image">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -287,8 +293,10 @@
           <div class="soulmate-meaning">"A love so deep, it turns into honey."<br>Our unique bond that transcends time and distance</div>
           
           <div class="soulmate-image-container">
-            <!-- FIX: replaced the unreliable Google Drive URL with the local brand image -->
-            <img id="soulmateImage" src="assets/deep.png" alt="DeepNectar - Our Eternal Soulmate Code" class="soulmate-image" onload="imageLoaded()" onerror="imageFailed()">
+            <!-- FIX: assets/deep.png was DELETED from the repo — this image 404'd
+                 on every load (broken-picture bug). The Soulmate logo now lives in
+                 its correct place here, as a compact transparent PNG. -->
+            <img id="soulmateImage" src="assets/soulmate-logo.png" alt="DeepNectar - Our Eternal Soulmate Code" class="soulmate-image" width="700" height="466" decoding="async" onload="imageLoaded()" onerror="imageFailed()">
             <div id="imagePlaceholder" class="soulmate-image-placeholder" style="display: none;">
               <div>DeepNectar</div>
               <div class="small-text">🐼❤️🍯🐻</div>

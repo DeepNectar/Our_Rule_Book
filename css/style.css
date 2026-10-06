@@ -1733,17 +1733,6 @@
    signature blank so it reads as "Sign: ____ ✍️". */
 .sign-inline-img { display: inline-block; width: 92px; height: 44px; object-fit: contain; vertical-align: middle; margin: 0 4px; background: rgba(255,255,255,0.95); border-radius: 8px; padding: 2px 4px; border-bottom: 2px dotted #ff99aa; filter: drop-shadow(0 2px 5px rgba(255,51,102,0.25)); }
 
-/* Legacy watermark style for Deep's signature — no longer used in the markup
-   (Deep uses the same inline "Sign:" holder as Honey), kept harmless. */
-.deep-signature-watermark {
-  display: none !important;
-}
-/* The signature box hosts the watermark behind its own text */
-.deep-signature-box { position: relative; overflow: visible; min-width: 280px; padding: 26px 24px; }
-/* Raise all text inside the box above the watermark */
-.deep-signature-box .name,
-.deep-signature-box .date-line,
-.deep-signature-box .sign-line { position: relative; z-index: 1; }
 
 /* Legacy: the giant watermark + full-box background signature photos were
    removed from the markup — signatures now appear ONLY on the "Sign:" lines.
@@ -1753,12 +1742,6 @@
 .mini-signature {
   display: none !important;
 }
-/* The signature box hosts the watermark behind its own text */
-.deep-signature-box { position: relative; overflow: visible; min-width: 280px; padding: 26px 24px; }
-/* Raise all text inside the box above the watermark */
-.deep-signature-box .name,
-.deep-signature-box .date-line,
-.deep-signature-box .sign-line { position: relative; z-index: 1; }
 
 /* Official stamp/seal between the two signature boxes */
 .stamp-seal { display: block; width: 120px; height: 120px; border-radius: 50%; object-fit: cover; margin: 10px auto 4px; background: rgba(255,255,255,0.95); padding: 6px; border: 3px solid rgba(255,51,102,0.6); box-shadow: 0 6px 18px rgba(255,51,102,0.35); transform: rotate(-8deg); }
@@ -1780,7 +1763,6 @@
   .signature-img { width: 130px; height: 70px; }
   .deep-signature-box { min-width: 220px; }
   /* keep it big on mobile too */
-  .deep-signature-watermark { width: 320% !important; max-width: 360px !important; min-width: 240px !important; opacity: 0.45 !important; }
   .stamp-seal { width: 90px; height: 90px; }
   .footer-signature { width: 100px; height: 58px; }
   .deep-footer-signature { width: 160px; height: 90px; }
@@ -1789,7 +1771,6 @@
   .password-logo { width: 74px; height: 74px; }
   .header-logo { width: 74px; height: 74px; }
   .signature-img { width: 110px; height: 60px; }
-  .deep-signature-watermark { width: 300% !important; max-width: 290px !important; min-width: 220px !important; }
   .stamp-seal { width: 74px; height: 74px; }
 }
 
@@ -1800,13 +1781,9 @@
 /* 1) "Sign: signature ✍️" — bigger signature images on BOTH persons'
       signature boxes (Deep & Honey use the same .sign-inline-img holder).
       These rules come last, so they win over the earlier media queries. */
-.sign-inline-img { width: 150px; height: 72px; }
-@media (max-width: 768px) {
-  .sign-inline-img { width: 120px; height: 58px; }
-}
-@media (max-width: 480px) {
-  .sign-inline-img { width: 96px; height: 46px; }
-}/* 3) Make both signature boxes (Deep & Honey) more compact in the
+
+
+/* 3) Make both signature boxes (Deep & Honey) more compact in the
       "Sealed With Our Love & Commitment ✍️💕💖♾️" section — tighter
       padding, smaller min-width and reduced inner spacing. */
 .signature-box { padding: 8px 12px; min-width: 150px; }
@@ -1833,10 +1810,186 @@
 
 /* The sign images that sit right on the "Sign: ______ ✍️" line — the ONLY
    place a signature image is shown on the page. Bigger so it reads clearly. */
-.sign-inline-img { width: 200px; height: 96px; }
-@media (max-width: 768px) {
-  .sign-inline-img { width: 160px; height: 78px; }
+
+/* ============================================================
+   POLISH PASS — romantic glassmorphism, compact mobile layout,
+   guaranteed-visible animations & performance
+   ============================================================ */
+
+/* 1) GLASS BOXES: every panel becomes a frosted, semi-transparent
+      "glass" card so the floating-heart animation layer is clearly
+      visible THROUGH and BEHIND all boxes (the request: "make the
+      boxes transparent so all animations are visible"). */
+.email-container,
+.password-box,
+.section,
+.contract-title,
+.intro-text,
+.rule-content,
+.special-note,
+.promise-box,
+.soulmate-section,
+.signature-section,
+.signature-box,
+.response-system-container,
+.response-option,
+.message-box,
+.email-list,
+.deepnectar-box,
+.deepnectar-middle,
+.html-email-preview,
+.header,
+.footer {
+  background-image: none; /* strip legacy opaque gradients… */
+  background-color: rgba(255, 252, 253, 0.55); /* …and use one soft glass tone */
+  -webkit-backdrop-filter: blur(7px) saturate(1.3);
+  backdrop-filter: blur(7px) saturate(1.3);
 }
-@media (max-width: 480px) {
-  .sign-inline-img { width: 128px; height: 62px; }
+.email-container { background-color: rgba(255, 252, 253, 0.42); }
+.header { background-color: rgba(255, 182, 193, 0.38); }
+.footer { background-color: rgba(255, 160, 190, 0.35); }
+.password-box { background-color: rgba(255, 255, 255, 0.58); }
+.rule-content { background-color: rgba(255, 255, 255, 0.38); }
+.response-option { background-color: rgba(255, 240, 244, 0.42); }
+.message-box { background-color: rgba(255, 255, 255, 0.5); }
+.html-email-preview { background-color: rgba(26, 26, 46, 0.78); }
+.deepnectar-middle { background-color: rgba(255, 240, 245, 0.5); }
+
+/* The animated heart layer must shine through the page body too */
+#mainContent { position: relative; z-index: 1; }
+.ultra-romantic-bg { z-index: 0; }
+
+/* 2) PROFESSIONAL TYPOGRAPHY: elegant serif display face for headings,
+      kept system-font based (no extra network request = faster). */
+body { font-family: Georgia, 'Palatino Linotype', 'Book Antiqua', 'Times New Roman', serif; letter-spacing: 0.2px; }
+.main-title, .section-title, .contract-title, .promise-title,
+.signature-title, .response-title, .soulmate-title, .seal, .password-title {
+  font-family: 'Didot', 'Bodoni MT', 'Playfair Display', Georgia, 'Times New Roman', serif;
+  letter-spacing: 0.5px;
+}
+.main-title { text-transform: none; }
+
+/* 3) COMPACT TEXT: tighten the oversized type everywhere (desktop base). */
+.subtitle       { font-size: 22px; margin: 14px 0; line-height: 1.5; }
+.couple-names   { font-size: 26px; gap: 16px; margin: 18px 0; }
+.contract-title { font-size: 30px; padding: 20px 60px; min-height: 0; margin-bottom: 34px; }
+.intro-text     { font-size: 18px; line-height: 1.8; padding: 22px; margin: 24px 0; }
+.section        { margin: 38px 0; padding: 26px 24px; }
+.section-title  { font-size: 25px; margin-bottom: 22px; }
+.rule-title     { font-size: 20px; margin: 24px 0 12px; }
+.rule-number    { width: 38px; height: 38px; line-height: 38px; font-size: 18px; margin-right: 14px; }
+.rule-content   { font-size: 17px; line-height: 1.85; padding: 16px 18px; margin: 12px 0; }
+.special-note   { padding: 22px 24px; margin: 28px 0; font-size: 16px; }
+.promise-box    { padding: 34px 28px; margin: 44px 0; }
+.promise-title  { font-size: 27px; margin-bottom: 18px; }
+.promise-text   { font-size: 18px; line-height: 1.8; margin: 16px 0; }
+.response-system-container { padding: 30px 26px; margin: 44px 0; }
+.response-title { font-size: 26px; margin-bottom: 20px; }
+.response-text  { font-size: 16px; line-height: 1.7; margin: 14px 0; }
+.response-option{ padding: 12px 14px; margin: 8px 0; }
+.response-label { font-size: 15.5px; line-height: 1.55; }
+.option-number  { width: 28px; font-size: 13px; padding: 3px; margin-right: 10px; }
+.message-box    { font-size: 16px; padding: 16px; min-height: 110px; margin: 18px 0; }
+.email-list     { font-size: 15px; padding: 14px 16px; line-height: 1.8; margin: 16px 0; }
+.complaint-btn  { padding: 14px 28px; font-size: 17px; min-width: 260px; gap: 12px; border-radius: 40px; }
+.complaint-buttons { gap: 16px; margin: 22px 0; }
+.btn-emoji      { font-size: 22px; }
+.soulmate-section { padding: 16px 18px; margin: 24px 0; }
+.soulmate-title { font-size: 21px; margin-bottom: 8px; }
+.soulmate-code  { font-size: 24px; }
+.soulmate-meaning { font-size: 15px; margin: 8px 0; }
+.signature-section { padding: 20px 16px; margin: 34px 0 24px 0; }
+.signature-title { font-size: 23px; }
+.name           { font-size: 18px; }
+.date-line, .sign-line { font-size: 13px; margin: 4px auto; padding: 4px 8px; }
+.stamp-caption  { font-size: 10px; }
+.email-format-toggle label { font-size: 15px; padding: 8px 16px; }
+.html-email-preview textarea { height: 260px; font-size: 12px; padding: 12px; }
+.html-email-preview .preview-note { font-size: 13px; }
+.emoji-large    { font-size: 28px; margin: 0 10px; }
+.seal           { font-size: 30px; margin: 18px 0; }
+.footer p       { font-size: 17px !important; margin: 14px 0 !important; }
+.header         { padding: 40px 26px; }
+.content        { padding: 40px 34px; }
+.footer         { padding: 40px 26px; }
+.email-container { margin: 24px auto; border-width: 3px; box-shadow: 0 18px 50px rgba(255,102,153,0.28); }
+.rule-category  { font-size: 12px; padding: 2px 10px; margin-left: 10px; }
+
+/* Compact intro name inside the contract */
+.intro-text strong[style] { font-size: 22px !important; }
+
+/* Soulmate logo: keep aspect ratio inside the hex frame, no cropping */
+.soulmate-image { object-fit: contain; }
+
+/* Inline signature images — compact but legible */
+.sign-inline-img { width: 130px; height: 58px; }
+
+/* 4) PHONE UX TWEAKS */
+@media only screen and (max-width: 768px) {
+  .email-container { margin: 10px 8px; }
+  .content { padding: 24px 14px; }
+  .header { padding: 28px 16px; }
+  .footer { padding: 28px 16px; }
+  .section { padding: 18px 14px; margin: 26px 0; }
+  .response-system-container { padding: 20px 14px; margin: 30px 0; }
+  .promise-box { padding: 24px 16px; margin: 30px 0; }
+  .rule-content { padding: 12px 12px; line-height: 1.75; }
+  .complaint-btn { width: 100%; min-width: 0; padding: 14px 12px; font-size: 15.5px; }
+  .sign-inline-img { width: 104px; height: 46px; }
+  .stamp-seal { width: 78px; height: 78px; }
+  .html-email-preview textarea { height: 200px; }
+  /* touch-friendly targets */
+  .response-option input[type="checkbox"] { min-width: 22px; min-height: 22px; }
+}
+@media only screen and (max-width: 480px) {
+  body { padding: 4px; }
+  .email-container { margin: 6px 4px; border-radius: 18px; }
+  .subtitle { font-size: 15px; }
+  .couple-names { font-size: 18px; gap: 4px; }
+  .heart-emoji, .heart-divider { font-size: 19px; }
+  .main-title { font-size: 20px; margin-bottom: 14px; }
+  .contract-title { font-size: 17px; padding: 12px 30px; margin-bottom: 22px; }
+  .intro-text { font-size: 14.5px; padding: 14px 12px; line-height: 1.7; }
+  .section-title { font-size: 17.5px; margin-bottom: 14px; }
+  .rule-title { font-size: 15px; margin: 18px 0 8px; }
+  .rule-number { width: 28px; height: 28px; line-height: 28px; font-size: 13px; margin-right: 8px; }
+  .rule-content { font-size: 13.5px; line-height: 1.7; padding: 10px 10px; }
+  .response-label { font-size: 13px; }
+  .response-text { font-size: 13.5px; }
+  .message-box { font-size: 14px; padding: 12px; min-height: 96px; }
+  .email-list { font-size: 12px; padding: 10px; word-break: break-word; }
+  .promise-title { font-size: 19px; }
+  .promise-text { font-size: 14.5px; line-height: 1.7; }
+  .seal { font-size: 21px; }
+  .footer p { font-size: 14px !important; }
+  .emoji-large { font-size: 20px; margin: 0 5px; }
+  .soulmate-code { font-size: 19px; }
+  .signature-box { padding: 8px 10px; }
+  .deep-signature-box { padding: 8px 10px; min-width: 0; }
+  .sign-inline-img { width: 88px; height: 40px; }
+  .password-box { padding: 24px 16px; }
+  .password-title { font-size: 19px; }
+  .password-subtitle { font-size: 13.5px; margin-bottom: 16px; }
+  .password-input { font-size: 15px; padding: 11px 40px 11px 12px; }
+  .password-btn { font-size: 15.5px; padding: 11px; }
+}
+
+/* 5) ANIMATIONS ALWAYS VISIBLE: raise emoji opacity a touch and make
+      sure nothing hides them while motion is allowed. */
+@keyframes floatEmoji {
+  0% { transform: translate(var(--startX), var(--startY)) rotate(0deg) scale(0.7); opacity: 0; }
+  8% { opacity: 0.45; }
+  20% { transform: translate(calc(var(--startX) + var(--moveX1)), calc(var(--startY) + var(--moveY1))) rotate(60deg) scale(0.9); opacity: 0.6; }
+  40% { transform: translate(calc(var(--startX) + var(--moveX2)), calc(var(--startY) + var(--moveY2))) rotate(120deg) scale(1); opacity: 0.7; }
+  60% { transform: translate(calc(var(--startX) + var(--moveX3)), calc(var(--startY) + var(--moveY3))) rotate(180deg) scale(0.9); opacity: 0.6; }
+  80% { transform: translate(calc(var(--startX) + var(--moveX4)), calc(var(--startY) + var(--moveY4))) rotate(240deg) scale(0.8); opacity: 0.45; }
+  100% { transform: translate(calc(var(--startX) + var(--moveX5)), calc(var(--startY) + var(--moveY5))) rotate(360deg) scale(0.6); opacity: 0; }
+}
+
+/* PERF: GPU-composited animations only; avoid paint-heavy filters on scroll */
+.floating-emoji, .nectar-bee { will-change: transform, opacity; contain: layout style; }
+
+/* Reduced motion still respected (accessibility) */
+@media (prefers-reduced-motion: reduce) {
+  .floating-emoji, .nectar-bee { display: none !important; }
 }
