@@ -243,7 +243,7 @@ span[class*="password-reveal"] { display: none !important; }
 /* ---------- Soulmate section ---------- */
 .soulmate-section { border: 2px solid #ff99aa; border-radius: 16px; padding: 12px 16px; margin: 22px 0; text-align: center; box-shadow: 0 8px 22px rgba(255,153,170,.18); }
 .soulmate-title { font-size: 19px; color: #ff3366; margin: 0 0 6px; font-weight: bold; text-shadow: 1px 1px 3px rgba(255,255,255,.95); font-family: 'Didot', 'Bodoni MT', 'Playfair Display', Georgia, serif; letter-spacing: .5px; }
-.soulmate-code { font-size: 30px; color: #ff0066; font-weight: bold; animation: romanticHeartbeat 2s infinite; line-height: 1.25; }
+.soulmate-code { font-size: 34px; color: #ff0066; font-weight: bold; animation: romanticHeartbeat 2s infinite; line-height: 1.25; }
 .soulmate-meaning { font-size: 14px; color: #8b5a5a; font-style: italic; margin: 6px 0; line-height: 1.5; }
 .soulmate-note { font-size: 13.5px; color: #8b5a5a; margin: 8px 0 0; line-height: 1.55; }
 
@@ -332,7 +332,7 @@ span[class*="password-reveal"] { display: none !important; }
 .date-line strong, .sign-line strong { font-size: 12.5px; font-weight: 600; }
 .sign-inline-img { display: inline-block; width: 110px; height: 48px; object-fit: contain; vertical-align: middle; margin: 0 4px; background: rgba(255,255,255,.95); border-radius: 8px; padding: 2px 4px; border-bottom: 2px dotted #ff99aa; filter: drop-shadow(0 2px 4px rgba(255,51,102,.25)); }
 
-.stamp-seal { display: block; width: 112px; height: 112px; border-radius: 50%; object-fit: cover; margin: 4px auto 3px; background: rgba(255,255,255,.95); padding: 5px; border: 3px solid rgba(255,51,102,.6); box-shadow: 0 5px 16px rgba(255,51,102,.35); transform: rotate(-8deg); }
+.stamp-seal { display: block; width: 130px; height: 130px; border-radius: 50%; object-fit: cover; margin: 4px auto 3px; background: rgba(255,255,255,.95); padding: 5px; border: 3px solid rgba(255,51,102,.6); box-shadow: 0 5px 16px rgba(255,51,102,.35); transform: rotate(-8deg); }
 .stamp-caption { display: block; font-size: 10px; font-weight: bold; color: #cc0044; letter-spacing: .5px; text-transform: uppercase; }
 
 /* ---------- DeepNectar banner ---------- */
@@ -411,7 +411,7 @@ span[class*="password-reveal"] { display: none !important; }
   .promise-text { font-size: 14.5px; line-height: 1.75; margin: 10px 0; }
   .soulmate-section { padding: 12px 12px; margin: 18px 0; }
   .soulmate-title { font-size: 17px; }
-  .soulmate-code { font-size: 25px; }
+  .soulmate-code { font-size: 28px; }
   .soulmate-meaning, .soulmate-note { font-size: 13px; }
   .soulmate-image-container { width: 200px; height: 170px; }
   .response-system-container { padding: 20px 14px; margin: 30px 0; border-width: 3px; border-radius: 20px; }
@@ -442,7 +442,7 @@ span[class*="password-reveal"] { display: none !important; }
   .signature-line { flex-direction: column; gap: 10px; }
   .signature-box { min-width: 0; width: 100%; max-width: 320px; }
   .sign-inline-img { width: 96px; height: 42px; }
-  .stamp-seal { width: 96px; height: 96px; }
+  .stamp-seal { width: 112px; height: 112px; }
   .footer { padding: 26px 16px; border-top-width: 3px; }
   .seal { font-size: 23px; }
   .footer p { font-size: 14px; }
@@ -515,14 +515,14 @@ span[class*="password-reveal"] { display: none !important; }
   .name { font-size: 16px; }
   .date-line, .sign-line { font-size: 11.5px; max-width: 100%; }
   .sign-inline-img { width: 84px; height: 38px; }
-  .stamp-seal { width: 84px; height: 84px; border-width: 2px; padding: 4px; }
+  .stamp-seal { width: 96px; height: 96px; border-width: 2px; padding: 4px; }
   .footer { padding: 22px 12px; }
   .seal { font-size: 20px; }
   .footer p { font-size: 13px; }
   .footer .footer-strong { font-size: 14.5px; }
   .emoji-large { font-size: 19px; margin: 0 4px; }
   .soulmate-image-container { width: 170px; height: 145px; }
-  .soulmate-code { font-size: 22px; }
+  .soulmate-code { font-size: 24px; }
   .deepnectar-border { font-size: 9px; letter-spacing: .5px; }
   .deepnectar-middle { font-size: 12px; padding: 4px 8px; }
   .deepnectar-text { font-size: 11px; white-space: normal; }
@@ -549,9 +549,9 @@ span[class*="password-reveal"] { display: none !important; }
   .response-title { font-size: 17px; }
   .complaint-btn { font-size: 12.5px; padding: 11px 8px; }
   .seal { font-size: 18px; }
-  .soulmate-code { font-size: 20px; }
+  .soulmate-code { font-size: 21px; }
   .soulmate-image-container { width: 150px; height: 128px; }
-  .stamp-seal { width: 76px; height: 76px; border-width: 2px; padding: 4px; }
+  .stamp-seal { width: 86px; height: 86px; border-width: 2px; padding: 4px; }
   .password-title { font-size: 17px; }
   .password-input { font-size: 14px; }
   .html-email-preview textarea { height: 150px; }
