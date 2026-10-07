@@ -147,6 +147,9 @@ function generateHtmlEmail(partner) {
 
   const logoUri = brandDataUri('assets/logo-stamp.png');
   const signUri = partnerSignatureUri(senderName);
+  // The "love stamp" (our official seal) in the sign-off area is deliberately
+  // SMALL — a compact 56px round seal next to the signature, not a big badge.
+  const LOVE_STAMP_SIZE = 56;
 
   // One elegant card per selected rule, each carrying its automatic
   // sub-selection: What Is The Issue / What We Have To Do / How To Fix It.
@@ -225,11 +228,22 @@ function generateHtmlEmail(partner) {
       ${rulesHtml}
       ${personalHtml}
 
-      <!-- Closing note -->
+      <!-- Closing note / sign-off area -->
       <tr><td style="padding:26px 32px 0;">
         <div style="font-family:Georgia,serif;font-size:15px;color:#5a3d3d;line-height:1.9;">I'm bringing this up because our relationship means everything to me 💕 — let's talk about it with love, understanding, and patience. Our bond is worth protecting and strengthening every day. 🤝✨</div>
         <div style="font-family:Georgia,serif;font-size:15px;color:#c2185b;margin-top:14px;">With all my love and hope for our future,</div>
-        <img src="${signUri}" alt="${senderName} signature" width="200" style="display:block;margin:10px 0 0;max-width:200px;height:auto;">
+        <table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin-top:10px;">
+          <tr>
+            <td valign="middle" style="padding:0 12px 0 0;">
+              <img src="${signUri}" alt="${senderName} signature" width="170" style="display:block;max-width:170px;height:auto;">
+            </td>
+            <td valign="middle" align="center" style="padding:0;">
+              <!-- small love stamp (official seal) -->
+              <img src="${logoUri}" alt="Official DeepNectar love stamp" width="${LOVE_STAMP_SIZE}" height="${LOVE_STAMP_SIZE}" style="display:block;width:${LOVE_STAMP_SIZE}px;height:${LOVE_STAMP_SIZE}px;border-radius:50%;background:#ffffff;padding:3px;border:2px solid #ffc1d4;">
+              <div style="font-family:Arial,sans-serif;font-size:8px;color:#cc0044;letter-spacing:.5px;margin-top:3px;text-transform:uppercase;">Love Stamp</div>
+            </td>
+          </tr>
+        </table>
         <div style="font-family:Arial,sans-serif;font-size:13px;color:#8b5a5a;margin-top:6px;">— ${senderName} (filed about ${partnerName})</div>
       </td></tr>
 

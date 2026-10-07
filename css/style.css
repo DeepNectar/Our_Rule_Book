@@ -486,7 +486,8 @@ span[class*="password-reveal"] { display: none !important; }
   .name { font-size: 14px; }
   .date-line, .sign-line { font-size: 10.5px; margin: 1px auto; padding: 2px 5px; }
   .sign-inline-img { width: clamp(48px, 12vw, 72px); }
-  :root { --seal-size: 128px; --stamp-size: 96px; --kiss-size: 110px; }
+  /* love stamp (official seal) sits INSIDE the sign-off area — keep it small */
+  :root { --seal-size: 128px; --stamp-size: 64px; --kiss-size: 110px; }
   .footer { padding: 26px 16px; border-top-width: 3px; }
   .seal { font-size: 23px; }
   .footer p { font-size: 14px; }
@@ -580,7 +581,8 @@ span[class*="password-reveal"] { display: none !important; }
   .sign-inline-img { width: clamp(42px, 11vw, 58px); }
   .vs { font-size: 16px; }
   .stamp-caption { font-size: 8px; letter-spacing: .2px; }
-  :root { --seal-size: 108px; --stamp-size: 76px; --kiss-size: 92px; }
+  /* smaller love stamp in the sign-off area (was 76px) */
+  :root { --seal-size: 108px; --stamp-size: 56px; --kiss-size: 92px; }
   .stamp-seal { border-width: 2px; padding: 4px; }
   .footer { padding: 22px 12px; }
   .seal { font-size: 20px; }
@@ -621,7 +623,8 @@ span[class*="password-reveal"] { display: none !important; }
   .seal { font-size: 18px; }
   .soulmate-code { font-size: 21px; }
   .soulmate-section { padding: 3px 5px; margin: 8px 0; }
-  :root { --seal-size: 96px; --stamp-size: 66px; --kiss-size: 80px; }
+  /* smallest love stamp on tiny phones (was 66px) */
+  :root { --seal-size: 96px; --stamp-size: 48px; --kiss-size: 80px; }
   /* Soulmate photo stays big even on tiny phones */
   .soulmate-image-container { width: min(78vw, 280px); height: min(78vw, 280px); margin: 2px auto; }
   .stamp-seal { border-width: 2px; padding: 4px; }
@@ -660,6 +663,8 @@ span[class*="password-reveal"] { display: none !important; }
   .sign-inline-img { width: 44px; }
   .vs { font-size: 14px; }
   .stamp-caption { font-size: 7.5px; letter-spacing: .2px; }
+  /* small love stamp in landscape sign-off area too (was 120px base) */
+  :root { --stamp-size: 56px; }
   .special-note { font-size: 11px; padding: 6px 8px; margin-top: 8px; }
   .password-box { padding: 16px 18px; max-height: 94vh; overflow-y: auto; }
   .password-title { font-size: 17px; }
@@ -693,16 +698,84 @@ span[class*="password-reveal"] { display: none !important; }
   .floating-emoji, .nectar-bee { display: none !important; }
 }
 
-/* Print: clean contract, never reveal the lock screen */
+/* ============================================================
+   PRINT / SAVE-AS-PDF — "Save as PDF" on a phone used to come out
+   COMPLETELY BLANK. Three separate killers, all fixed here:
+     1. The phone's WebKit print engine cannot rasterize CSS
+        animations/filters while paginating: every element that was
+        mid-keyframe (romanticHeartbeat scale, gentleGlow, float,
+        beeHover, nectarDrip) or behind a backdrop-filter printed with
+        an empty paint layer — i.e. nothing on the page.
+     2. `background-attachment: fixed` + gradient/glass backgrounds are
+        dropped by mobile print engines, so the whole page painted white
+        on white.
+     3. The rulebook only becomes visible after unlocking, and mobile
+        browsers snapshot the print layout before our JS runs — so if the
+        session wasn't restored yet, #mainContent was still display:none
+        => one blank sheet. js/app.js now also adds <html class="printing">
+        inside onbeforeprint (and right before window.print()), which
+        forces the content open even in that snapshot.
+   Everything below is print-only, so the on-screen look is unchanged.
+   ============================================================ */
 @media print {
-  body { background: white !important; padding: 0 !important; }
-  #passwordOverlay { display: none !important; }
-  #mainContent { display: block !important; }
-  .floating-emoji, .nectar-bee { display: none !important; }
-  .email-container { box-shadow: none !important; border-radius: 0 !important; border: none !important; max-width: 100% !important; margin: 0 !important; background: white !important; }
-  .section { box-shadow: none !important; page-break-inside: avoid; border-left: 4px solid #ff6699 !important; background: white !important; }
-  .header, .footer { background: white !important; color: #000 !important; border-color: #000 !important; }
-  .main-title, .subtitle, .couple-names, .seal { color: #000 !important; text-shadow: none !important; }
-  .promise-box, .special-note, .signature-section { background: white !important; border-color: #999 !important; }
-  .soulmate-image-container { clip-path: none !important; -webkit-clip-path: none !important; }
+  html, body { background: #ffffff !important; height: auto !important; overflow: visible !important; }
+  body { padding: 0 !important; margin: 0 !important; width: auto !important; max-width: 100% !important;
+         -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+  /* 1. no animation/filter/blend magic while printing */
+  *, *::before, *::after {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+    mix-blend-mode: normal !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* 2. never print the lock screen; always print the rulebook itself */
+  #passwordOverlay, .ultra-romantic-bg, .floating-emoji, .nectar-bee,
+  .response-system-container, .email-format-toggle, .html-email-preview,
+  .subject-copy-row, .complaint-buttons, .complaint-btn, .copy-btn,
+  .message-box, .email-list, .toggle-password-btn, .password-btn,
+  .preview-note, .response-text { display: none !important; }
+
+  #mainContent { display: block !important; position: static !important; z-index: auto !important; }
+  /* safety net for the mobile print snapshot (see js/app.js markPrinting()) */
+  html.printing #mainContent { display: block !important; }
+  html.printing #passwordOverlay { display: none !important; }
+
+  /* 3. solid, printable surfaces instead of glass + fixed gradients */
+  .email-container { max-width: 100% !important; width: 100% !important; margin: 0 !important;
+                     border: none !important; border-radius: 0 !important; background: #fff !important; }
+  .content { padding: 12px 8px !important; }
+  .header, .footer { background: #fff !important; color: #000 !important; border-color: #000 !important; }
+  .main-title, .subtitle, .couple-names, .seal, .heart-emoji, .heart-divider { color: #000 !important; }
+  .section { background: #fff !important; border: 1px solid #ddd !important; border-left: 4px solid #ff6699 !important;
+             border-radius: 0 !important; page-break-inside: avoid; break-inside: avoid; margin: 10px 0 !important; }
+  .rule-content, .promise-box, .special-note, .signature-section, .soulmate-section, .contract-title, .intro-text {
+    background: #fff !important; border-color: #999 !important; color: #000 !important; }
+  .deepnectar-box, .deepnectar-middle { background: #fff !important; }
+  /* keep the brand images: transparent PNGs would otherwise print invisible */
+  .brand-logo, .stamp-seal, .sign-inline-img { background: #fff !important; }
+  .stamp-seal { transform: none !important; }
+  /* the soulmate photo keeps its heart shape when printing from a computer;
+     phones that ignore clip-path while printing fall back to a plain square */
+  .soulmate-image-container { background: #fff !important; }
+
+  /* readable sizes on paper */
+  .main-title { font-size: 22pt !important; }
+  .subtitle { font-size: 12pt !important; }
+  .section-title { font-size: 15pt !important; }
+  .rule-title { font-size: 12pt !important; }
+  .rule-content, .intro-text, .promise-text, .special-note { font-size: 10.5pt !important; line-height: 1.6 !important; }
+  .name, .date-line, .sign-line { font-size: 11pt !important; }
+  .stamp-caption { font-size: 8pt !important; }
+
+  /* A4 friendly margins */
+  @page { size: A4 portrait; margin: 12mm 10mm; }
 }
