@@ -284,11 +284,19 @@ function generateHtmlEmail(partner) {
   document.getElementById('htmlEmailContent').value = htmlEmail;
 }
 
+// Copies the FULL generated e-mail in ONE automatic action on any device:
+// the SUBJECT line first, then the complete HTML source — from
+// <!DOCTYPE html> all the way to </html>, start to end. On phones the async
+// clipboard can be blocked (no permission / not a secure focus), so if it
+// rejects we fall back to select-all + execCommand('copy'), which guarantees
+// the entire payload leaves the page — never a partial copy.
 function copyHtmlEmail() {
   const subjectInput = document.getElementById('htmlSubjectInput');
   const subject = (subjectInput && subjectInput.value) ? subjectInput.value : '';
-  // The clipboard gets BOTH: a SUBJECT line to paste manually, then the HTML code.
-  const payload = `SUBJECT: ${subject}\n\n${document.getElementById('htmlEmailContent').value}`;
+  const textarea = document.getElementById('htmlEmailContent');
+  const htmlCode = textarea ? textarea.value : '';
+  // The clipboard gets BOTH: a SUBJECT line to paste manually, then the FULL HTML code.
+  const payload = `SUBJECT: ${subject}\n\n${htmlCode}`;
 
   const done = () => {
     const btn = document.getElementById('copyHtmlBtn');
@@ -297,18 +305,28 @@ function copyHtmlEmail() {
     setTimeout(() => { btn.textContent = '📋 Copy Subject + HTML'; btn.classList.remove('copied'); }, 3000);
   };
 
+  // Fallback for mobile browsers: temporarily put the WHOLE payload
+  // (SUBJECT + HTML, start to end) into the visible textarea, force-select
+  // every character, copy, then restore the original raw HTML value.
+  function fallbackCopy() {
+    if (textarea) {
+      const original = htmlCode;
+      textarea.value = payload;
+      textarea.focus({ preventScroll: true });
+      textarea.select();
+      try { textarea.setSelectionRange(0, payload.length); } catch (e) { /* ignore */ }
+      try { document.execCommand('copy'); } catch (e) { /* clipboard unavailable */ }
+      textarea.value = original;
+      if (textarea.blur) textarea.blur();
+    }
+    done();
+  }
+
   if (navigator.clipboard && navigator.clipboard.writeText) {
+    // Promise-based write of the ENTIRE payload; any rejection falls back below.
     navigator.clipboard.writeText(payload).then(done).catch(() => fallbackCopy());
   } else {
     fallbackCopy();
-  }
-
-  function fallbackCopy() {
-    const textarea = document.getElementById('htmlEmailContent');
-    textarea.select();
-    textarea.setSelectionRange(0, 99999);
-    try { document.execCommand('copy'); } catch (e) { /* clipboard unavailable */ }
-    done();
   }
 }
 
@@ -580,14 +598,15 @@ function sendComplaint(target) {
   const subject = `💌 Romantic Complaint About ${partner} - ${dateStr}`;
 
   if (format === 'html') {
-    // Generate + show the romantic HTML right here in the page (works on
-    // phones too — no popup blocking). Auto-copy SUBJECT + HTML so one tap
-    // gets everything needed to paste into the email app.
+    // HTML EMAIL MODE: this button must NEVER open/trigger the mail app.
+    // One tap only regenerates everything in-page — fresh SUBJECT + full
+    // HTML code (and with it the latest rule selections, sub-complaints and
+    // personal message) — auto-copies it to the clipboard, and reveals the
+    // preview. No mailto:, no Gmail window, no app launch.
     generateHtmlEmail(target);
     copyHtmlEmail();
     const previewBox = document.getElementById('htmlEmailPreview');
     if (previewBox) previewBox.classList.add('show');
-    openMailAppEmpty();
     setTimeout(() => {
       if (typeof alert === 'function') {
         alert(`✅ Subject + HTML email about ${partner} generated & copied!\n\n✉️ Now:\n1️⃣ Paste (Ctrl+V / long-press → Paste) into your email app's body/HTML editor\n2️⃣ Type the recipient's mail ID yourself — none is stored in this app\n3️⃣ Paste the first line as the Subject`);
