@@ -287,6 +287,41 @@ span[class*="password-reveal"] { display: none !important; }
 .response-option.opt-all       { border-left-color: #ff0066; border-left-width: 6px; background-color: rgba(255,208,224,.6); }
 .response-option.opt-all .response-label strong { color: #ff0066; font-size: 16px; }
 
+/* ===== Sub-complaint auto-details (appears when a rule is ticked) ===== */
+.response-option { flex-wrap: wrap; }
+.sub-complaint-panel {
+  flex-basis: 100%;
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, .78);
+  border: 1.5px dashed #ff9bb5;
+  box-shadow: 0 4px 14px rgba(255, 102, 153, .12);
+  cursor: default;
+  animation: subPanelIn .35s ease;
+}
+@keyframes subPanelIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+.sub-panel-title { font-family: Georgia, serif; font-size: 14px; font-weight: bold; color: #c2185b; margin-bottom: 8px; line-height: 1.4; }
+.sub-panel-section { font-size: 11.5px; font-weight: normal; color: #b07a85; text-transform: uppercase; letter-spacing: .5px; }
+.sub-item { font-size: 13px; color: #5a3d3d; line-height: 1.6; padding: 7px 10px; border-radius: 8px; margin-bottom: 6px; }
+.sub-item:last-child { margin-bottom: 0; }
+.sub-item strong { display: inline; }
+.sub-issue { background: #fff0f4; }  .sub-issue strong { color: #c2185b; }
+.sub-todo  { background: #fdf3e7; }  .sub-todo  strong { color: #b26a00; }
+.sub-fix   { background: #eefaf1; }  .sub-fix   strong { color: #1e7d43; }
+.sub-complaint-counter { display: none; font-size: 13.5px; color: #c2185b; line-height: 1.6; padding: 10px 14px; margin: 4px 0 6px; border-radius: 10px; background: rgba(255, 224, 236, .65); border: 1.5px solid #ffc1d4; text-align: center; }
+.sub-complaint-counter.show { display: block; animation: subPanelIn .3s ease; }
+/* Sub-item rows stack vertically on narrow screens for readability */
+@media only screen and (max-width: 560px) {
+  .sub-item { font-size: 12.5px; padding: 6px 8px; }
+  .sub-panel-title { font-size: 13px; }
+}
+/* Phone speed boost keeps panels static — disable just the panel fade-in */
+@media (hover: none) and (pointer: coarse) {
+  .sub-complaint-panel, .sub-complaint-counter.show { animation: none; box-shadow: none; }
+}
+
 .message-box { width: 100%; min-height: 110px; border: 2px solid rgba(255,153,170,.7); border-radius: 12px; padding: 14px 16px; color: #5a3d3d; font-size: 15px; font-family: Georgia, serif; margin: 16px 0; resize: vertical; box-shadow: inset 0 0 18px rgba(255,102,153,.15); transition: all .3s ease; z-index: 11; }
 .message-box:focus { outline: none; border-color: #ff3366; box-shadow: inset 0 0 22px rgba(255,102,153,.25), 0 0 18px rgba(255,51,102,.2); }
 
