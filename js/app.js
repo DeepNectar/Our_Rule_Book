@@ -467,6 +467,50 @@ function buildRuleDetails(selected) {
   });
 }
 
+// ==================== On-page sub-complaint panel ====================
+// When a rule checkbox is ticked in the complaint list, its matching
+// sub-complaint card (What Is The Issue / What We Have To Do / How To Fix)
+// appears right below that option instantly — no need to open the email
+// preview to see what will be sent. Unticking hides it again.
+function renderSubComplaintPanel() {
+  document.querySelectorAll('.response-option').forEach(opt => {
+    const cb = opt.querySelector('input[type="checkbox"]');
+    if (!cb) return;
+    let panel = opt.querySelector('.sub-complaint-panel');
+    if (!cb.checked) { if (panel) panel.remove(); return; }
+    const option = cb.getAttribute('data-option');
+    // "ALL rules" row shows a summary instead of one rule's details
+    const meta = option === 'all' ? RULE_META.all : getRuleMeta({ option, value: cb.value });
+    if (!meta) return;
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.className = 'sub-complaint-panel';
+      // Never intercept taps — clicking the card still toggles its checkbox
+      panel.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); });
+      opt.appendChild(panel);
+    }
+    const rows =
+      `<div class="sub-item sub-issue"><strong>🔍 What Is The Issue:</strong> ${escapeHtml(meta.issue)}</div>` +
+      `<div class="sub-item sub-todo"><strong>🤝 What We Have To Do:</strong> ${escapeHtml(meta.todo)}</div>` +
+      `<div class="sub-item sub-fix"><strong>💖 How We Fix It:</strong> ${escapeHtml(meta.fix)}</div>`;
+    panel.innerHTML =
+      `<div class="sub-panel-title">📋 Sub-Complaint Details — ${escapeHtml(meta.title)} <span class="sub-panel-section">(${escapeHtml(meta.section)})</span></div>` +
+      rows;
+  });
+  // Live count helper under the options list
+  const counter = document.getElementById('subComplaintCounter');
+  if (counter) {
+    const n = document.querySelectorAll('.response-checkbox:checked').length;
+    if (n > 0) {
+      counter.classList.add('show');
+      counter.innerHTML = `💘 <strong>${n}</strong> sub-complaint${n > 1 ? 's' : ''} ready — each card above shows the Issue, What To Do &amp; How To Fix that will be included in your email!`;
+    } else {
+      counter.classList.remove('show');
+      counter.innerHTML = '';
+    }
+  }
+}
+
 const ALL_RULES = [
   "✅ Rule 1 - Honesty Issue: I feel there might be something not being shared openly between us. Let's talk about maintaining complete honesty in our relationship. Trust is our foundation!",
   "✅ Rule 2 - Loyalty Check: I need reassurance about our commitment and loyalty to each other. Our bond is sacred and I want to make sure we're both protecting it completely.",
@@ -642,10 +686,20 @@ document.addEventListener('DOMContentLoaded', function () {
       const cb = this.querySelector('input[type="checkbox"]');
       if (e.target === cb && Math.abs((cb._lastToggleTime || 0) - Date.now()) < 500) return;
       if (e.target !== cb) {
-        cb.checked = !cb.checked;
-        cb._lastToggleTime = Date.now();
+        // Inside a <label>, browsers ALSO forward the tap to the checkbox.
+        // If we flip `checked` ourselves here, the two flips cancel out and
+        // nothing gets selected — so in real browsers we let the native
+        // toggle happen (the change event below renders the sub-complaint
+        // panel). Only flip manually when native forwarding is absent
+        // (jsdom / synthetic clicks).
+        const nativeForwards = typeof window !== 'undefined' && typeof window.MouseEvent === 'function';
+        if (!nativeForwards) {
+          cb.checked = !cb.checked;
+          cb._lastToggleTime = Date.now();
+        }
       }
       syncAllRulesExclusivity(cb);
+      renderSubComplaintPanel();
     });
   });
   function syncAllRulesExclusivity(cb) {
@@ -666,7 +720,10 @@ document.addEventListener('DOMContentLoaded', function () {
       const all = document.querySelector('.response-checkbox[data-option="all"]');
       if (all) all.checked = false;
     }
+    renderSubComplaintPanel();
   });
+  // Initial paint of the sub-complaint helper area (empty until a rule is ticked)
+  renderSubComplaintPanel();
 });
 
 // Re-spawn hearts only when the device profile actually changes
@@ -687,5 +744,6 @@ window.addEventListener('orientationchange', () => setTimeout(() => window.dispa
 Object.assign(window, {
   checkPassword, toggleEmailFormat, generateHtmlEmail, copyHtmlEmail,
   sendComplaint, sendComplaintForDeep, sendComplaintForHoney,
-  imageLoaded, imageFailed, createNectarSwarm, initFloatingEmojis
+  imageLoaded, imageFailed, createNectarSwarm, initFloatingEmojis,
+  renderSubComplaintPanel
 });
