@@ -241,14 +241,14 @@ span[class*="password-reveal"] { display: none !important; }
 .promise-text { font-size: 16.5px; color: #8b5a5a; line-height: 1.85; margin: 14px 0; position: relative; z-index: 1; text-shadow: 1px 1px 3px rgba(255,255,255,.9); }
 
 /* ---------- Soulmate section ---------- */
-.soulmate-section { border: 2px solid #ff99aa; border-radius: 18px; padding: 16px 18px; margin: 26px 0; text-align: center; box-shadow: 0 8px 22px rgba(255,153,170,.18); }
-.soulmate-title { font-size: 20px; color: #ff3366; margin: 0 0 8px; font-weight: bold; text-shadow: 1px 1px 3px rgba(255,255,255,.95); font-family: 'Didot', 'Bodoni MT', 'Playfair Display', Georgia, serif; letter-spacing: .5px; }
-.soulmate-code { font-size: 24px; color: #ff0066; font-weight: bold; animation: romanticHeartbeat 2s infinite; line-height: 1.3; }
-.soulmate-meaning { font-size: 14.5px; color: #8b5a5a; font-style: italic; margin: 8px 0; line-height: 1.55; }
-.soulmate-note { font-size: 14px; color: #8b5a5a; margin: 10px 0 0; line-height: 1.6; }
+.soulmate-section { border: 2px solid #ff99aa; border-radius: 16px; padding: 12px 16px; margin: 22px 0; text-align: center; box-shadow: 0 8px 22px rgba(255,153,170,.18); }
+.soulmate-title { font-size: 19px; color: #ff3366; margin: 0 0 6px; font-weight: bold; text-shadow: 1px 1px 3px rgba(255,255,255,.95); font-family: 'Didot', 'Bodoni MT', 'Playfair Display', Georgia, serif; letter-spacing: .5px; }
+.soulmate-code { font-size: 30px; color: #ff0066; font-weight: bold; animation: romanticHeartbeat 2s infinite; line-height: 1.25; }
+.soulmate-meaning { font-size: 14px; color: #8b5a5a; font-style: italic; margin: 6px 0; line-height: 1.5; }
+.soulmate-note { font-size: 13.5px; color: #8b5a5a; margin: 8px 0 0; line-height: 1.55; }
 
 .soulmate-image-container {
-  margin: 12px auto; width: 240px; height: 200px; position: relative;
+  margin: 10px auto; width: 240px; height: 200px; position: relative;
   display: flex; align-items: center; justify-content: center; overflow: hidden;
   background: transparent; transition: transform .3s ease;
   clip-path: polygon(50% 0%, 100% 35%, 82% 100%, 50% 80%, 18% 100%, 0% 35%);
@@ -321,19 +321,19 @@ span[class*="password-reveal"] { display: none !important; }
 .html-email-preview .subject-line { color: #ff6699; font-weight: bold; }
 
 /* ---------- Signature section ---------- */
-.signature-section { margin: 34px 0 24px; padding: 22px 18px; border-radius: 20px; border: 3px solid #ff99aa; text-align: center; box-shadow: 0 10px 28px rgba(255,153,170,.22); }
-.signature-title { font-size: 22px; color: #ff3366; margin: 0 0 14px; font-weight: bold; text-shadow: 1px 1px 4px rgba(255,255,255,.95); line-height: 1.35; font-family: 'Didot', 'Bodoni MT', 'Playfair Display', Georgia, serif; letter-spacing: .5px; }
-.signature-line { display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 14px; margin: 8px 0; }
-.signature-box { text-align: center; padding: 10px 14px; min-width: 190px; max-width: 100%; background: rgba(255,255,255,.85); border-radius: 14px; border: 2px solid rgba(255,153,170,.7); box-shadow: 0 5px 14px rgba(255,153,170,.15); transition: transform .3s ease; }
+.signature-section { margin: 28px 0 20px; padding: 16px 14px; border-radius: 18px; border: 3px solid #ff99aa; text-align: center; box-shadow: 0 10px 28px rgba(255,153,170,.22); }
+.signature-title { font-size: 21px; color: #ff3366; margin: 0 0 10px; font-weight: bold; text-shadow: 1px 1px 4px rgba(255,255,255,.95); line-height: 1.3; font-family: 'Didot', 'Bodoni MT', 'Playfair Display', Georgia, serif; letter-spacing: .5px; }
+.signature-line { display: flex; justify-content: center; align-items: stretch; flex-wrap: wrap; gap: 12px; margin: 6px 0; }
+.signature-box { text-align: center; padding: 8px 12px; min-width: 190px; max-width: 100%; background: rgba(255,255,255,.85); border-radius: 12px; border: 2px solid rgba(255,153,170,.7); box-shadow: 0 5px 14px rgba(255,153,170,.15); transition: transform .3s ease; }
 .signature-box:hover { transform: translateY(-4px) scale(1.01); }
-.name { font-size: 18px; color: #ff3366; margin: 2px 0 6px; font-weight: bold; text-shadow: 1px 1px 3px rgba(255,51,102,.15); position: relative; z-index: 1; }
+.name { font-size: 18px; color: #ff3366; margin: 0 0 4px; font-weight: bold; text-shadow: 1px 1px 3px rgba(255,51,102,.15); position: relative; z-index: 1; }
 .vs { font-size: 22px; color: #ff3366; font-weight: bold; animation: float 2s ease-in-out infinite; }
-.date-line, .sign-line { font-size: 12.5px; color: #8b5a5a; margin: 5px auto; padding: 5px 8px; border-bottom: 2px dotted #ff99aa; width: auto; max-width: 230px; background: rgba(255,255,255,.8); border-radius: 8px; line-height: 1.45; position: relative; z-index: 1; }
+.date-line, .sign-line { font-size: 12.5px; color: #8b5a5a; margin: 4px auto; padding: 4px 8px; border-bottom: 2px dotted #ff99aa; width: auto; max-width: 230px; background: rgba(255,255,255,.8); border-radius: 8px; line-height: 1.4; position: relative; z-index: 1; }
 .date-line strong, .sign-line strong { font-size: 12.5px; font-weight: 600; }
 .sign-inline-img { display: inline-block; width: 110px; height: 48px; object-fit: contain; vertical-align: middle; margin: 0 4px; background: rgba(255,255,255,.95); border-radius: 8px; padding: 2px 4px; border-bottom: 2px dotted #ff99aa; filter: drop-shadow(0 2px 4px rgba(255,51,102,.25)); }
 
-.stamp-seal { display: block; width: 92px; height: 92px; border-radius: 50%; object-fit: cover; margin: 6px auto 4px; background: rgba(255,255,255,.95); padding: 5px; border: 3px solid rgba(255,51,102,.6); box-shadow: 0 5px 16px rgba(255,51,102,.35); transform: rotate(-8deg); }
-.stamp-caption { display: block; font-size: 9.5px; font-weight: bold; color: #cc0044; letter-spacing: .5px; text-transform: uppercase; }
+.stamp-seal { display: block; width: 112px; height: 112px; border-radius: 50%; object-fit: cover; margin: 4px auto 3px; background: rgba(255,255,255,.95); padding: 5px; border: 3px solid rgba(255,51,102,.6); box-shadow: 0 5px 16px rgba(255,51,102,.35); transform: rotate(-8deg); }
+.stamp-caption { display: block; font-size: 10px; font-weight: bold; color: #cc0044; letter-spacing: .5px; text-transform: uppercase; }
 
 /* ---------- DeepNectar banner ---------- */
 .deepnectar-box { display: flex; flex-direction: column; align-items: center; margin: 22px 0 12px; background: linear-gradient(135deg, rgba(255,240,245,.8), rgba(255,230,240,.8)); border-radius: 14px; padding: 10px 8px; border: 2px solid rgba(255,153,170,.7); box-shadow: 0 6px 18px rgba(255,102,153,.18); position: relative; overflow: hidden; }
@@ -409,9 +409,9 @@ span[class*="password-reveal"] { display: none !important; }
   .promise-box { padding: 22px 16px; margin: 30px 0; border-width: 3px; }
   .promise-title { font-size: 21px; }
   .promise-text { font-size: 14.5px; line-height: 1.75; margin: 10px 0; }
-  .soulmate-section { padding: 14px 12px; margin: 20px 0; }
+  .soulmate-section { padding: 12px 12px; margin: 18px 0; }
   .soulmate-title { font-size: 17px; }
-  .soulmate-code { font-size: 20px; }
+  .soulmate-code { font-size: 25px; }
   .soulmate-meaning, .soulmate-note { font-size: 13px; }
   .soulmate-image-container { width: 200px; height: 170px; }
   .response-system-container { padding: 20px 14px; margin: 30px 0; border-width: 3px; border-radius: 20px; }
@@ -437,12 +437,12 @@ span[class*="password-reveal"] { display: none !important; }
   .html-email-preview .copy-btn { width: 100%; padding: 9px 14px; font-size: 13px; }
   .html-email-preview textarea { height: 190px; font-size: 10.5px; padding: 10px; }
   .html-email-preview .preview-note { font-size: 11.5px; padding: 8px 10px; }
-  .signature-section { padding: 18px 12px; margin: 26px 0 20px; }
-  .signature-title { font-size: 19px; }
-  .signature-line { flex-direction: column; gap: 12px; }
+  .signature-section { padding: 14px 12px; margin: 24px 0 18px; }
+  .signature-title { font-size: 18px; }
+  .signature-line { flex-direction: column; gap: 10px; }
   .signature-box { min-width: 0; width: 100%; max-width: 320px; }
   .sign-inline-img { width: 96px; height: 42px; }
-  .stamp-seal { width: 78px; height: 78px; }
+  .stamp-seal { width: 96px; height: 96px; }
   .footer { padding: 26px 16px; border-top-width: 3px; }
   .seal { font-size: 23px; }
   .footer p { font-size: 14px; }
@@ -511,18 +511,18 @@ span[class*="password-reveal"] { display: none !important; }
   .email-format-toggle { flex-direction: column; }
   .email-format-toggle label { flex: 1 1 100%; width: 100%; font-size: 12.5px; }
   .html-email-preview textarea { height: 170px; }
-  .signature-box { padding: 8px 10px; }
+  .signature-box { padding: 7px 10px; }
   .name { font-size: 16px; }
   .date-line, .sign-line { font-size: 11.5px; max-width: 100%; }
   .sign-inline-img { width: 84px; height: 38px; }
-  .stamp-seal { width: 66px; height: 66px; }
+  .stamp-seal { width: 84px; height: 84px; border-width: 2px; padding: 4px; }
   .footer { padding: 22px 12px; }
   .seal { font-size: 20px; }
   .footer p { font-size: 13px; }
   .footer .footer-strong { font-size: 14.5px; }
   .emoji-large { font-size: 19px; margin: 0 4px; }
   .soulmate-image-container { width: 170px; height: 145px; }
-  .soulmate-code { font-size: 18px; }
+  .soulmate-code { font-size: 22px; }
   .deepnectar-border { font-size: 9px; letter-spacing: .5px; }
   .deepnectar-middle { font-size: 12px; padding: 4px 8px; }
   .deepnectar-text { font-size: 11px; white-space: normal; }
@@ -549,7 +549,9 @@ span[class*="password-reveal"] { display: none !important; }
   .response-title { font-size: 17px; }
   .complaint-btn { font-size: 12.5px; padding: 11px 8px; }
   .seal { font-size: 18px; }
+  .soulmate-code { font-size: 20px; }
   .soulmate-image-container { width: 150px; height: 128px; }
+  .stamp-seal { width: 76px; height: 76px; border-width: 2px; padding: 4px; }
   .password-title { font-size: 17px; }
   .password-input { font-size: 14px; }
   .html-email-preview textarea { height: 150px; }
