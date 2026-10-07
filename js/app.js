@@ -116,9 +116,8 @@ function partnerSignatureUri(partnerName) {
 }
 
 // ==================== Generated complaint e-mail ====================
-// PRIVACY: no default mail IDs are stored anywhere in this app. The user
-// enters recipient address(es) manually before the email client opens.
-let EMAIL_RECIPIENTS = '';
+// PRIVACY: NO mail IDs anywhere — none stored, asked or prefilled. The user
+// types the recipient directly inside their own email app after pasting.
 const DATE_OPTS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 const TIME_OPTS = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
 const DEEP_BRANDING = '\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n░░░░░░░░▒▓█►─═  𝔻𝕖𝕖𝕡ℕ𝕖𝕔𝕥𝕒𝕣  ═─◄█▓▒░░░░░░░░\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n\n🐝 "A love so deep, it turns into honey." 🐝\n\nOur eternal soulmate code that binds us forever';
@@ -137,13 +136,17 @@ function generateHtmlEmail(partner) {
 
   const isDeep = partner !== 'honey';
   const partnerName = isDeep ? 'Deep 🐼' : 'Honey 🍯🐻';
+  // SENDER = the OTHER partner (the one filing this complaint). Their sign
+  // appears in the email — complaint about Honey shows Deep's signature,
+  // complaint about Deep shows Honey's signature.
+  const senderName = isDeep ? 'Honey 🍯🐻' : 'Deep 🐼';
   const subjectLine = `💌 Romantic Complaint About ${partnerName} - ${dateStr}`;
   document.getElementById('htmlSubjectDisplay').textContent = subjectLine;
   const subjectInput = document.getElementById('htmlSubjectInput');
   if (subjectInput) subjectInput.value = subjectLine; // kept so the copy button grabs it too
 
   const logoUri = brandDataUri('assets/logo-stamp.png');
-  const signUri = partnerSignatureUri(partnerName);
+  const signUri = partnerSignatureUri(senderName);
 
   // One elegant card per selected rule, each carrying its automatic
   // sub-selection: What Is The Issue / What We Have To Do / How To Fix It.
@@ -226,8 +229,8 @@ function generateHtmlEmail(partner) {
       <tr><td style="padding:26px 32px 0;">
         <div style="font-family:Georgia,serif;font-size:15px;color:#5a3d3d;line-height:1.9;">I'm bringing this up because our relationship means everything to me 💕 — let's talk about it with love, understanding, and patience. Our bond is worth protecting and strengthening every day. 🤝✨</div>
         <div style="font-family:Georgia,serif;font-size:15px;color:#c2185b;margin-top:14px;">With all my love and hope for our future,</div>
-        <img src="${signUri}" alt="${partnerName} signature" width="200" style="display:block;margin:10px 0 0;max-width:200px;height:auto;">
-        <div style="font-family:Arial,sans-serif;font-size:13px;color:#8b5a5a;margin-top:6px;">— ${partnerName}</div>
+        <img src="${signUri}" alt="${senderName} signature" width="200" style="display:block;margin:10px 0 0;max-width:200px;height:auto;">
+        <div style="font-family:Arial,sans-serif;font-size:13px;color:#8b5a5a;margin-top:6px;">— ${senderName} (filed about ${partnerName})</div>
       </td></tr>
 
       <!-- Divider -->
@@ -490,30 +493,19 @@ const ALL_RULES = [
   "✅ Rule 23 - Growth Check-In: We missed our monthly check-in about goals, support, and happiness. Is there anything you need from me to feel happier or more supported? Let's grow together."
 ];
 
-// Ask for recipient(s) at send time — no default mail IDs are stored.
-// Remembers what was typed for this session only (never saved permanently).
-// If a prompt UI isn't available (embedded/test browsers), fall back to the
-// "To:" field in the complaint card, then to whatever was used this session.
-function getRecipients() {
-  const stored = sessionStorage.getItem('deepNectarRecipients') || '';
-  const toField = document.getElementById('recipientEmails');
-  if (typeof prompt !== 'function') {
-    const manual = toField ? toField.value.trim() : '';
-    const val = manual || stored;
-    EMAIL_RECIPIENTS = val;
-    return val;
+// NO MAIL IDs ANYWHERE — nothing is asked, stored or prefilled.
+// The user pastes the email (or opens the blank mail app) and types the
+// recipient's address directly inside their own email app.
+// Opening the email app EMPTY (no recipient) so the user can paste the
+// copied Subject + HTML and type the mail ID themselves.
+function openMailAppEmpty() {
+  if (isMobileDevice()) {
+    // Blank mailto: opens the phone's default mail composer with empty To:.
+    window.location.href = 'mailto:';
+  } else {
+    // Gmail compose window with no "to" pre-filled.
+    window.open('https://mail.google.com/mail/?view=cm&fs=1', '_blank', 'noopener,noreferrer,width=800,height=600');
   }
-  const entered = prompt(
-    '📬 Enter your partner\'s email address(es):\n\nSeparate multiple addresses with commas.\n(No default mail IDs are stored in this app — you type them every time.)',
-    (toField && toField.value.trim()) || stored
-  );
-  if (entered === null) return null; // user cancelled
-  const clean = entered.split(',').map(e => e.trim()).filter(Boolean).join(',');
-  if (!clean) { alert('⚠️ Please enter at least one email address to send the complaint.'); return null; }
-  if (toField) toField.value = clean;
-  sessionStorage.setItem('deepNectarRecipients', clean);
-  EMAIL_RECIPIENTS = clean;
-  return clean;
 }
 
 function sendComplaint(target) {
@@ -523,30 +515,34 @@ function sendComplaint(target) {
   const selected = getSelectedResponses();
   const personalMsg = document.getElementById('personalMessage').value.trim();
   const format = document.querySelector('input[name="emailFormat"]:checked').value;
+  // target = who the complaint is ABOUT. The SENDER is the other partner,
+  // so the signature/greeting always shows the sender's own sign.
   const partner = target === 'deep' ? 'Deep 🐼' : 'Honey 🍯🐻';
+  const sender = target === 'deep' ? 'Honey 🍯🐻' : 'Deep 🐼';
   const subject = `💌 Romantic Complaint About ${partner} - ${dateStr}`;
 
-  // No default mail IDs stored — ask who should receive it (session memory only).
-  const recipients = getRecipients();
-  if (!recipients) return; // user cancelled / entered nothing
-
   if (format === 'html') {
+    // Generate + show the romantic HTML right here in the page (works on
+    // phones too — no popup blocking). Auto-copy SUBJECT + HTML so one tap
+    // gets everything needed to paste into the email app.
     generateHtmlEmail(target);
-    const htmlContent = document.getElementById('htmlEmailContent').value;
-    const win = window.open('', '_blank', 'width=800,height=600');
-    if (win) {
-      const writeDoc = () => {
-        try { win.document.open(); win.document.write(htmlContent); win.document.close(); } catch (e) { /* preview box still holds the code */ }
-      };
-      if (win.document.readyState === 'complete') writeDoc();
-      else win.addEventListener('load', writeDoc);
-    } else if (typeof alert === 'function') {
-      alert('Please allow popups to view the HTML email preview.');
-    }
+    copyHtmlEmail();
+    const previewBox = document.getElementById('htmlEmailPreview');
+    if (previewBox) previewBox.classList.add('show');
+    openMailAppEmpty();
+    setTimeout(() => {
+      if (typeof alert === 'function') {
+        alert(`✅ Subject + HTML email about ${partner} generated & copied!\n\n✉️ Now:\n1️⃣ Paste (Ctrl+V / long-press → Paste) into your email app's body/HTML editor\n2️⃣ Type the recipient's mail ID yourself — none is stored in this app\n3️⃣ Paste the first line as the Subject`);
+      }
+    }, 400);
     return;
   }
 
-  const greeting = target === 'deep' ? 'With all my love and hope for our future,\nFrom your Honey 🍯 Bee 🐝' : 'With all my love and hope for our future,';
+  // Plain text: copy the full email (SUBJECT + body) and open a BLANK mail
+  // composer — no mail ID included anywhere.
+  const greeting = target === 'deep'
+    ? 'With all my love and hope for our future,\nFrom your Honey 🍯 Bee 🐝'
+    : 'With all my love and hope for our future,\nFrom your Deep 🐼';
   const sep = '\n\n═══════════════════════════════════════════════\n\n';
   let body = `💌💌💌 ROMANTIC LOVE CONTRACT COMPLAINT & DISCUSSION 💌💌💌\n\n📅 Date: ${dateStr}\n⏰ Time: ${timeStr}\n💝 Regarding: Our Complete Love & Trust Rulebook (23 Rules!)\n❤️ Status: Romantic Discussion Needed${sep}`;
   if (selected.length) {
@@ -563,15 +559,30 @@ function sendComplaint(target) {
   if (personalMsg) body += `💖 PERSONAL MESSAGE & DEEP FEELINGS:\n\n${personalMsg}\n\n${sep}`;
   body += `I'm bringing this up because our relationship means everything to me 💕\nI believe in our rules and our promise to each other 🤝\n\nLet's talk about this with love, understanding, and patience 💭\nOur bond is worth protecting and strengthening every day 💪❤️\n\n${greeting}${DEEP_BRANDING}\n\n${sep}💖 OUR ETERNAL SOULMATE CODE: DeepNectar 💖\n\n"A love so deep, it turns into honey."\n\nThis code represents our eternal connection - a love so deep, it becomes the sweetest honey.\nNo matter what we discuss or work through, remember we are DeepNectar forever. 🐼❤️🐻\n\n💌❤️💌❤️💌❤️💌❤️💌`;
 
-  if (isMobileDevice()) {
-    window.location.href = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  // Copy SUBJECT + full plain-text body to clipboard, then open a BLANK
+  // mail composer — NO mail ID is ever included or stored. The user types
+  // the recipient directly in their email app and pastes this content.
+  const payload = `SUBJECT: ${subject}\n\n${body}`;
+  const textarea = document.getElementById('htmlEmailContent');
+  const donePlain = () => { openMailAppEmpty(); };
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(payload).then(donePlain).catch(() => {
+      if (textarea) {
+        textarea.value = payload; textarea.select();
+        try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+      }
+      donePlain();
+    });
   } else {
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipients)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&ui=2&tf=1`;
-    window.open(gmailUrl, '_blank', 'noopener,noreferrer,width=800,height=600');
+    if (textarea) {
+      textarea.value = payload; textarea.select();
+      try { document.execCommand('copy'); } catch (e) { /* ignore */ }
+    }
+    donePlain();
   }
   setTimeout(() => {
-    if (typeof alert === 'function') alert(`📧 Opening email with romantic complaint about ${partner}!\n\nYour message includes ${selected.length} rule concerns!`);
-  }, 300);
+    if (typeof alert === 'function') alert(`✅ Complaint email from ${sender} about ${partner} copied to clipboard!\n\n✉️ Paste it into your email app, type the recipient's mail ID yourself.\n\nYour message includes ${selected.length} rule concern(s) with Issue / What To Do / How To Fix details!`);
+  }, 400);
 }
 function sendComplaintForDeep() { sendComplaint('deep'); }
 function sendComplaintForHoney() { sendComplaint('honey'); }
