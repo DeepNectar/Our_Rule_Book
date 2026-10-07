@@ -6,7 +6,7 @@
    ============================================================ */
 
 /* ---------- Base & romantic background ---------- */
-:root { --seal-size: 220px; --stamp-size: 120px; }
+:root { --seal-size: 220px; --stamp-size: 120px; --kiss-size: 150px; }
 *, *::before, *::after { box-sizing: border-box; }
 html, body { max-width: 100%; overflow-x: hidden; }
 img { max-width: 100%; height: auto; }
@@ -358,7 +358,7 @@ span[class*="password-reveal"] { display: none !important; }
 .brand-logo { display: block; margin: 0 auto 14px; border-radius: 50%; object-fit: cover; background: rgba(255,255,255,.9); padding: 5px; box-shadow: 0 5px 16px rgba(255,51,102,.35); border: 3px solid rgba(255,255,255,.95); }
 .password-logo { width: 92px; height: 92px; }
 .header-logo { width: 100px; height: 100px; }
-.footer-logo { width: var(--seal-size); height: var(--seal-size); border-radius: 50%; object-fit: cover; background: rgba(255,255,255,.95); padding: 5px; border: 3px solid rgba(255,51,102,.6); box-shadow: 0 5px 16px rgba(255,51,102,.35); }
+.footer-logo { width: var(--kiss-size); height: var(--kiss-size); border-radius: 50%; object-fit: cover; background: rgba(255,255,255,.95); padding: 5px; border: 3px solid rgba(255,51,102,.6); box-shadow: 0 5px 16px rgba(255,51,102,.35); }
 
 /* ============================================================
    RESPONSIVE — one clean set of breakpoints, compact by device
@@ -441,7 +441,7 @@ span[class*="password-reveal"] { display: none !important; }
   .signature-line { flex-wrap: wrap; gap: 8px; }
   .signature-box { min-width: 0; flex: 1 1 auto; width: auto; max-width: 100%; padding: 5px 8px; }
   .sign-inline-img { width: 72px; height: 32px; }
-  :root { --seal-size: 128px; --stamp-size: 96px; }
+  :root { --seal-size: 128px; --stamp-size: 96px; --kiss-size: 110px; }
   .footer { padding: 26px 16px; border-top-width: 3px; }
   .seal { font-size: 23px; }
   .footer p { font-size: 14px; }
@@ -514,7 +514,7 @@ span[class*="password-reveal"] { display: none !important; }
   .date-line, .sign-line { font-size: 10.5px; max-width: 100%; margin: 1px auto; padding: 2px 5px; }
   .date-line strong, .sign-line strong { font-size: 10.5px; }
   .sign-inline-img { width: 60px; height: 28px; }
-  :root { --seal-size: 108px; --stamp-size: 76px; }
+  :root { --seal-size: 108px; --stamp-size: 76px; --kiss-size: 92px; }
   .stamp-seal { border-width: 2px; padding: 4px; }
   .footer { padding: 22px 12px; }
   .seal { font-size: 20px; }
@@ -548,7 +548,7 @@ span[class*="password-reveal"] { display: none !important; }
   .complaint-btn { font-size: 12.5px; padding: 11px 8px; }
   .seal { font-size: 18px; }
   .soulmate-code { font-size: 21px; }
-  :root { --seal-size: 96px; --stamp-size: 66px; }
+  :root { --seal-size: 96px; --stamp-size: 66px; --kiss-size: 80px; }
   .stamp-seal { border-width: 2px; padding: 4px; }
   .password-title { font-size: 17px; }
   .password-input { font-size: 14px; }
