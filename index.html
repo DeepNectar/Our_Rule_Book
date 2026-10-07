@@ -264,17 +264,21 @@
           <!-- HTML Email Preview Box -->
           <div class="html-email-preview" id="htmlEmailPreview">
             <div class="preview-header">
-              <span>🎨 HTML Email Version — Copy the code below and paste into your email's HTML editor</span>
-              <button class="copy-btn" id="copyHtmlBtn" onclick="copyHtmlEmail()">📋 Copy HTML</button>
+              <span>🎨 HTML Email Version — Copy everything below (SUBJECT + HTML code) and paste into your email</span>
+              <button class="copy-btn" id="copyHtmlBtn" onclick="copyHtmlEmail()">📋 Copy Subject + HTML</button>
+            </div>
+            <div class="subject-copy-row">
+              <label for="htmlSubjectInput" class="subject-copy-label">✉️ Email Subject (copied automatically with the HTML — paste it in the subject field manually):</label>
+              <input type="text" id="htmlSubjectInput" readonly value="💌 Romantic Complaint About [Partner] - [Date]">
             </div>
             <textarea id="htmlEmailContent" readonly></textarea>
             <div class="preview-note">
-              💡 <strong>How to use:</strong> Copy this HTML code and paste it into your email client's HTML editor (e.g., Gmail's "Insert HTML" option, Outlook's "Insert as HTML", or any email composer that supports HTML).<br>
-              📧 <strong>Subject line is automatically included:</strong> <span id="htmlSubjectDisplay" class="subject-line">💌 Romantic Complaint About [Partner] - [Date]</span>
+              💡 <strong>How to use:</strong> Press "Copy Subject + HTML" — one copy grabs both. Paste the SUBJECT into your email's subject line, then paste the HTML code into your email client's HTML editor (e.g., Gmail's "Insert HTML" option, Outlook's "Insert as HTML", or any email composer that supports HTML).<br>
+              📧 <strong>Subject line included in the copy:</strong> <span id="htmlSubjectDisplay" class="subject-line">💌 Romantic Complaint About [Partner] - [Date]</span>
             </div>
           </div>
           
-          <div class="email-list">📧 All replies will go to:<br>💌 deep2811p@zohomail.com<br>📱 deep2810m@icloud.com<br>✉️ deep2811p@gmail.com<br>🍯 hp8289986@gmail.com</div>
+          <div class="email-list">📬 <strong>To:</strong> your partner's email address(es) — enter them below or when prompted before sending.<br><input type="text" id="recipientEmails" placeholder="partner@email.com (separate multiple with commas)" autocomplete="off" style="width:100%;box-sizing:border-box;margin-top:8px;padding:9px 12px;border-radius:10px;border:2px solid #ff6699;background:#fff;color:#5a3d3d;font-family:'Courier New',monospace;font-size:13.5px;"><br>💡 No default mail IDs are stored in this app for your privacy — you always type the recipient(s) yourself.</div>
           
           <div class="complaint-buttons">
             <button class="complaint-btn complaint-btn-deep" onclick="sendComplaintForDeep()"><span class="btn-emoji">🐼</span> File Romantic Complaint About Deep <span class="btn-emoji">🐻</span></button>

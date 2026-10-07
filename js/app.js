@@ -116,7 +116,9 @@ function partnerSignatureUri(partnerName) {
 }
 
 // ==================== Generated complaint e-mail ====================
-const EMAIL_RECIPIENTS = ['deep2811p@zohomail.com', 'deep2810m@icloud.com', 'deep2811p@gmail.com', 'hp8289986@gmail.com'].join(',');
+// PRIVACY: no default mail IDs are stored anywhere in this app. The user
+// enters recipient address(es) manually before the email client opens.
+let EMAIL_RECIPIENTS = '';
 const DATE_OPTS = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 const TIME_OPTS = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true };
 const DEEP_BRANDING = '\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n░░░░░░░░▒▓█►─═  𝔻𝕖𝕖𝕡ℕ𝕖𝕔𝕥𝕒𝕣  ═─◄█▓▒░░░░░░░░\n░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n\n🐝 "A love so deep, it turns into honey." 🐝\n\nOur eternal soulmate code that binds us forever';
@@ -127,6 +129,7 @@ function escapeHtml(s) {
 
 function generateHtmlEmail(partner) {
   const selected = getSelectedResponses();
+  const details = buildRuleDetails(selected);
   const personalMsg = document.getElementById('personalMessage').value.trim();
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-US', DATE_OPTS);
@@ -136,72 +139,128 @@ function generateHtmlEmail(partner) {
   const partnerName = isDeep ? 'Deep 🐼' : 'Honey 🍯🐻';
   const subjectLine = `💌 Romantic Complaint About ${partnerName} - ${dateStr}`;
   document.getElementById('htmlSubjectDisplay').textContent = subjectLine;
+  const subjectInput = document.getElementById('htmlSubjectInput');
+  if (subjectInput) subjectInput.value = subjectLine; // kept so the copy button grabs it too
 
   const logoUri = brandDataUri('assets/logo-stamp.png');
   const signUri = partnerSignatureUri(partnerName);
 
-  const rulesHtml = selected.length
-    ? '<div style="background:#fff5f7;padding:16px;border-radius:12px;margin:16px 0;border-left:5px solid #ff3366;">' +
-      '<h3 style="color:#ff3366;margin-top:0;">📜 Selected Rule Concerns:</h3>' +
-      selected.map(r => `<p style="margin:8px 0;padding:6px 10px;background:#fff;border-radius:8px;border:1px solid #ffe0e5;">${escapeHtml(r.value)}</p>`).join('') +
-      '</div>'
+  // One elegant card per selected rule, each carrying its automatic
+  // sub-selection: What Is The Issue / What We Have To Do / How To Fix It.
+  const rulesHtml = details.length
+    ? `<tr><td style="padding:28px 32px 0;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;background:#fff8fa;border:1px solid #ffd6e0;border-radius:14px;">
+          <tr><td style="padding:22px 24px 6px;">
+            <div style="font-family:Georgia,'Times New Roman',serif;font-size:19px;color:#c2185b;font-weight:bold;">📜 Selected Rule Concerns &amp; Discussion Points</div>
+            <div style="font-family:Arial,sans-serif;font-size:13px;color:#a06a75;margin-top:6px;line-height:1.6;">Each concern below automatically includes what the issue is, what we have to do, and how we fix it — with love.</div>
+          </td></tr>
+          <tr><td style="padding:10px 24px 24px;">
+            ${details.map(d => d.meta ? `
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;background:#ffffff;border:1px solid #ffe0e8;border-left:5px solid #ff6699;border-radius:12px;margin:0 0 14px;">
+              <tr><td style="padding:16px 18px;">
+                <div style="font-family:Georgia,serif;font-size:16px;color:#d81b60;font-weight:bold;">💔 Rule ${escapeHtml(String(d.num))} — ${escapeHtml(d.meta.title)}</div>
+                <div style="font-family:Arial,sans-serif;font-size:12px;color:#b07a85;margin-top:4px;text-transform:uppercase;letter-spacing:1px;">${escapeHtml(d.meta.section)}</div>
+                <div style="font-family:Arial,sans-serif;font-size:14px;color:#5a3d3d;line-height:1.7;margin-top:10px;">${escapeHtml(d.text)}</div>
+                <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="border-collapse:separate;margin-top:12px;">
+                  <tr>
+                    <td style="padding:10px 12px;background:#fff0f4;border-radius:8px;font-family:Arial,sans-serif;font-size:13px;color:#5a3d3d;line-height:1.6;width:33%;vertical-align:top;"><strong style="color:#c2185b;">🔍 What Is The Issue:</strong><br>${escapeHtml(d.meta.issue)}</td>
+                    <td style="width:8px;"></td>
+                    <td style="padding:10px 12px;background:#fdf3e7;border-radius:8px;font-family:Arial,sans-serif;font-size:13px;color:#5a3d3d;line-height:1.6;width:33%;vertical-align:top;"><strong style="color:#b26a00;">🤝 What We Have To Do:</strong><br>${escapeHtml(d.meta.todo)}</td>
+                    <td style="width:8px;"></td>
+                    <td style="padding:10px 12px;background:#eefaf1;border-radius:8px;font-family:Arial,sans-serif;font-size:13px;color:#5a3d3d;line-height:1.6;width:33%;vertical-align:top;"><strong style="color:#1e7d43;">💖 How We Fix It:</strong><br>${escapeHtml(d.meta.fix)}</td>
+                  </tr>
+                </table>
+              </td></tr>
+            </table>` : `
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;background:#ffffff;border:1px solid #ffe0e8;border-left:5px solid #ff6699;border-radius:12px;margin:0 0 14px;">
+              <tr><td style="padding:14px 18px;font-family:Arial,sans-serif;font-size:14px;color:#5a3d3d;line-height:1.7;">${escapeHtml(d.text)}</td></tr>
+            </table>`).join('')}
+          </td></tr>
+        </table>
+      </td></tr>`
     : '';
 
   const personalHtml = personalMsg
-    ? `<div style="background:#fff0f5;padding:16px;border-radius:12px;margin:16px 0;border-left:5px solid #ff6699;">
-       <h3 style="color:#ff3366;margin-top:0;">💖 Personal Message:</h3>
-       <p style="font-size:16px;line-height:1.8;color:#5a3d3d;">${escapeHtml(personalMsg)}</p></div>`
+    ? `<tr><td style="padding:24px 32px 0;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;background:#fff0f5;border:1px solid #ffd6e0;border-left:5px solid #ff3366;border-radius:12px;">
+          <tr><td style="padding:20px 22px;">
+            <div style="font-family:Georgia,serif;font-size:18px;color:#c2185b;font-weight:bold;">💖 Personal Message &amp; Deep Feelings</div>
+            <div style="font-family:Georgia,serif;font-size:15px;color:#5a3d3d;line-height:1.9;margin-top:10px;white-space:pre-wrap;">${escapeHtml(personalMsg)}</div>
+          </td></tr>
+        </table>
+      </td></tr>`
     : '';
 
+  // Romantic + professional, mail-client-safe (tables + inline styles only).
   const htmlEmail = `<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <title>${subjectLine}</title>
-<style type="text/css">
-  body { font-family: Georgia, 'Times New Roman', serif; max-width: 700px; margin: 0 auto; padding: 24px 16px; color: #5a3d3d; background: #fff5f7; line-height: 1.8; }
-  .email-header, .footer { text-align: center; padding: 24px 16px; background: linear-gradient(135deg, #ffb6c1, #ff6699); border-radius: 18px; color: white; }
-  .email-header h1 { font-size: 26px; margin: 0; }
-  .email-header p { font-size: 15px; margin: 8px 0 0; opacity: .9; }
-  .divider { border: none; height: 3px; background: linear-gradient(to right, transparent, #ff3366, transparent); margin: 24px 0; }
-  .card { background: #fff; padding: 20px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,.05); }
-  .soft { text-align: center; padding: 16px; background: #fff5f7; border-radius: 12px; }
-  .code { font-size: 22px; font-weight: bold; color: #fff; }
-  .meaning { font-size: 14px; opacity: .9; font-style: italic; margin: 8px 0 0; }
-  img.logo { display: block; margin: 0 auto 10px; border-radius: 50%; background: #fff; padding: 4px; }
-</style>
+<!--[if mso]><style>body{font-family:Georgia,serif;}</style><![endif]-->
 </head>
-<body>
-<div class="email-header">
-  <img class="logo" src="${logoUri}" alt="DeepNectar Logo" width="80" height="80">
-  <h1>💌 Romantic Complaint About ${partnerName}</h1>
-  <p>📅 ${dateStr} at ${timeStr}</p>
-</div>
-<div class="card">
-  <p style="font-size:18px;color:#ff3366;font-weight:bold;">💖 Our Complete Love & Trust Rulebook Discussion</p>
-  <p style="font-size:15px;color:#8b5a5a;">This romantic complaint is being filed to strengthen our bond and address concerns in our relationship contract.</p>
-  ${rulesHtml}
-  ${personalHtml}
-  <hr class="divider">
-  <div class="soft">
-    <p style="font-size:16px;color:#ff3366;font-weight:bold;">💕 Our Eternal Soulmate Code</p>
-    <p style="font-size:24px;color:#ff0066;font-weight:bold;letter-spacing:3px;">DeepNectar</p>
-    <p style="font-size:14px;color:#8b5a5a;font-style:italic;">"A love so deep, it turns into honey."</p>
-  </div>
-  <hr class="divider">
-  <div class="soft">
-    <p style="font-size:15px;color:#ff3366;font-weight:bold;margin:0 0 8px;">✍️ Signed with love,</p>
-    <img src="${signUri}" alt="${partnerName} signature" width="200" style="display:inline-block;max-width:200px;height:auto;">
-    <p style="font-size:13px;color:#8b5a5a;margin:6px 0 0;">${partnerName}</p>
-  </div>
-</div>
-<div class="footer">
-  <img class="logo" src="${logoUri}" alt="DeepNectar Logo" width="60" height="60">
-  <p style="font-size:16px;margin:0;">💖 Forever Yours, Always Us 💖</p>
-  <div class="code">DeepNectar</div>
-  <div class="meaning">"A love so deep, it turns into honey."</div>
-</div>
+<body style="margin:0;padding:0;background-color:#fbeef2;-webkit-text-size-adjust:100%;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#fbeef2;">
+  <tr><td align="center" style="padding:28px 12px;">
+    <table role="presentation" width="680" cellpadding="0" cellspacing="0" style="width:100%;max-width:680px;background-color:#ffffff;border-radius:18px;overflow:hidden;border:1px solid #f3cdd8;box-shadow:0 8px 30px rgba(194,24,91,0.10);">
+
+      <!-- Header -->
+      <tr><td style="background-color:#d81b60;background-image:linear-gradient(135deg,#ff6699 0%,#d81b60 60%,#ad1457 100%);padding:34px 32px;text-align:center;">
+        <img src="${logoUri}" alt="DeepNectar Logo" width="84" height="84" style="display:block;margin:0 auto 14px;border-radius:50%;background:#ffffff;padding:5px;border:2px solid #ffc1d4;">
+        <div style="font-family:Georgia,'Times New Roman',serif;font-size:26px;color:#ffffff;font-weight:bold;line-height:1.3;">💌 Romantic Complaint About ${partnerName}</div>
+        <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;color:#ffd9e4;margin-top:10px;letter-spacing:1px;">📅 ${dateStr} &nbsp;•&nbsp; ⏰ ${timeStr}</div>
+        <div style="font-family:Georgia,serif;font-style:italic;font-size:14px;color:#ffe4ee;margin-top:8px;">"A love so deep, it turns into honey." 🐝</div>
+      </td></tr>
+
+      <!-- Intro -->
+      <tr><td style="padding:30px 32px 6px;">
+        <div style="font-family:Georgia,serif;font-size:18px;color:#c2185b;font-weight:bold;">💖 Our Complete Love &amp; Trust Rulebook Discussion</div>
+        <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#8b5a5a;line-height:1.8;margin-top:8px;">My love, this gentle complaint is filed not to blame, but to understand — to strengthen our bond and honor every promise in our relationship contract. ❤️</div>
+      </td></tr>
+      ${rulesHtml}
+      ${personalHtml}
+
+      <!-- Closing note -->
+      <tr><td style="padding:26px 32px 0;">
+        <div style="font-family:Georgia,serif;font-size:15px;color:#5a3d3d;line-height:1.9;">I'm bringing this up because our relationship means everything to me 💕 — let's talk about it with love, understanding, and patience. Our bond is worth protecting and strengthening every day. 🤝✨</div>
+        <div style="font-family:Georgia,serif;font-size:15px;color:#c2185b;margin-top:14px;">With all my love and hope for our future,</div>
+        <img src="${signUri}" alt="${partnerName} signature" width="200" style="display:block;margin:10px 0 0;max-width:200px;height:auto;">
+        <div style="font-family:Arial,sans-serif;font-size:13px;color:#8b5a5a;margin-top:6px;">— ${partnerName}</div>
+      </td></tr>
+
+      <!-- Divider -->
+      <tr><td style="padding:26px 32px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr>
+          <td style="border-top:2px solid #ffc1d4;"></td>
+          <td style="font-family:Arial,sans-serif;font-size:16px;color:#ff6699;padding:0 12px;">💞</td>
+          <td style="border-top:2px solid #ffc1d4;"></td>
+        </tr></table>
+      </td></tr>
+
+      <!-- Soulmate code -->
+      <tr><td style="padding:0 32px 30px;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;background-color:#fce4ec;border:1px dashed #f06292;border-radius:14px;">
+          <tr><td align="center" style="padding:22px 20px;">
+            <div style="font-family:Georgia,serif;font-size:16px;color:#c2185b;font-weight:bold;">🔐 Our Eternal Soulmate Code ♾️</div>
+            <div style="font-family:Georgia,serif;font-size:26px;color:#d81b60;font-weight:bold;letter-spacing:4px;margin-top:8px;">DeepNectar</div>
+            <div style="font-family:Georgia,serif;font-style:italic;font-size:14px;color:#8b5a5a;margin-top:8px;">"A love so deep, it turns into honey." 🐼❤️🐻🍯</div>
+          </td></tr>
+        </table>
+      </td></tr>
+
+      <!-- Footer -->
+      <tr><td style="background-color:#ad1457;padding:26px 32px;text-align:center;">
+        <img src="${logoUri}" alt="DeepNectar Logo" width="54" height="54" style="display:block;margin:0 auto 10px;border-radius:50%;background:#ffffff;padding:4px;">
+        <div style="font-family:Georgia,serif;font-size:17px;color:#ffffff;font-weight:bold;">💖 Forever Yours, Always Us 💖</div>
+        <div style="font-family:Arial,sans-serif;font-size:12px;color:#f8bbd0;margin-top:8px;line-height:1.7;">This code represents our eternal connection — no matter what we discuss or work through,<br>we are DeepNectar forever. 🐼❤️🐻</div>
+      </td></tr>
+
+    </table>
+    <div style="font-family:Arial,sans-serif;font-size:11px;color:#b07a85;margin-top:16px;">💌 Crafted with love • DeepNectar Love Contract</div>
+  </td></tr>
+</table>
 </body>
 </html>`;
 
@@ -209,14 +268,31 @@ function generateHtmlEmail(partner) {
 }
 
 function copyHtmlEmail() {
-  const textarea = document.getElementById('htmlEmailContent');
-  textarea.select();
-  textarea.setSelectionRange(0, 99999);
-  try { document.execCommand('copy'); } catch (e) { /* clipboard unavailable */ }
-  const btn = document.getElementById('copyHtmlBtn');
-  btn.textContent = '✅ Copied!';
-  btn.classList.add('copied');
-  setTimeout(() => { btn.textContent = '📋 Copy HTML'; btn.classList.remove('copied'); }, 3000);
+  const subjectInput = document.getElementById('htmlSubjectInput');
+  const subject = (subjectInput && subjectInput.value) ? subjectInput.value : '';
+  // The clipboard gets BOTH: a SUBJECT line to paste manually, then the HTML code.
+  const payload = `SUBJECT: ${subject}\n\n${document.getElementById('htmlEmailContent').value}`;
+
+  const done = () => {
+    const btn = document.getElementById('copyHtmlBtn');
+    btn.textContent = '✅ Subject + HTML Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = '📋 Copy Subject + HTML'; btn.classList.remove('copied'); }, 3000);
+  };
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(payload).then(done).catch(() => fallbackCopy());
+  } else {
+    fallbackCopy();
+  }
+
+  function fallbackCopy() {
+    const textarea = document.getElementById('htmlEmailContent');
+    textarea.select();
+    textarea.setSelectionRange(0, 99999);
+    try { document.execCommand('copy'); } catch (e) { /* clipboard unavailable */ }
+    done();
+  }
 }
 
 // ==================== Device-aware floating emojis ====================
@@ -331,6 +407,63 @@ function createNectarSwarm() {
 }
 
 // ==================== Complaints ====================
+// Each rule carries its own sub-selection details: what the issue is,
+// what should happen instead (what we have to do), and how to fix it.
+// When a rule is selected in the complaint system, these details are
+// automatically included in the plain-text AND HTML complaint emails.
+const RULE_META = {
+  1:  { title: 'Honesty Concern', section: 'Foundation Rules (1-12)', issue: 'Something feels like it isn\'t being shared openly between us.', todo: 'Share the truth gently and completely — trust is our foundation, so nothing stays hidden from each other.', fix: 'An open, judgment-free heart-to-heart where everything comes out with love.' },
+  2:  { title: 'Loyalty Reassurance', section: 'Foundation Rules (1-12)', issue: 'I need reassurance about our commitment and loyalty to each other.', todo: 'Reaffirm our exclusive bond verbally and through actions — our bond is sacred and must be protected completely.', fix: 'A loving commitment reconfirmation and extra reassurance moments.' },
+  3:  { title: 'Transparency Talk', section: 'Foundation Rules (1-12)', issue: 'Something feels hidden or not fully disclosed.', todo: 'Keep our "no secrets — big or small" promise alive; disclose what\'s being held back.', fix: 'Clear the air calmly, with full transparency and zero judgement.' },
+  4:  { title: 'Support Needed', section: 'Foundation Rules (1-12)', issue: 'I feel alone during a difficult time and need more emotional support.', todo: 'Stand by each other in every moment — good or bad — with presence, listening and encouragement.', fix: 'Quality comfort time: a listen, a hug, and "I\'m here for you" in words and actions.' },
+  5:  { title: 'Communication Issue', section: 'Foundation Rules (1-12)', issue: 'We haven\'t been sharing things before/after like we promised.', todo: 'Resume our promise of sharing — tell each other about important things before they happen and after.', fix: 'Rebuild the daily sharing habit so communication keeps our love strong.' },
+  6:  { title: 'Feeling Ignored', section: 'Foundation Rules (1-12)', issue: 'I feel ignored or not prioritized recently.', todo: 'Honor our "presence over distance" promise — give attention, reply, and spend real time together.', fix: 'A dedicated reconnect session: undivided attention, no phones, just us.' },
+  7:  { title: 'Valuation Issue', section: 'Foundation Rules (1-12)', issue: 'I don\'t feel valued equally like friends are.', todo: 'Give our relationship the same (or more) time, respect and fun we give to friends.', fix: 'Equal-value gestures: include each other in plans, prioritize us first.' },
+  8:  { title: 'Priority Concern', section: 'Foundation Rules (1-12)', issue: 'Our relationship isn\'t getting the priority it deserves.', todo: 'Keep our special place in each other\'s lives — family first, then us, with us never last.', fix: 'A priority reset: schedule "us time" that cannot be displaced.' },
+  9:  { title: 'Apology Problem', section: 'Foundation Rules (1-12)', issue: 'An apology didn\'t come with the promised effort.', todo: 'Back every sorry with real proof — photos and actions, not just words.', fix: 'A sincere apology plus visible corrective action (actions speak louder).' },
+  10: { title: 'Daily Connection', section: 'Foundation Rules (1-12)', issue: 'We missed our daily selfie connection.', todo: 'Exchange our daily selfies — those smiles brighten the day and keep us connected across any distance.', fix: 'Restart the daily selfie ritual, no skipping.' },
+  11: { title: 'Sanctuary Issue', section: 'Foundation Rules (1-12)', issue: 'We argued in front of others / didn\'t protect our private sanctuary.', todo: 'Keep disagreements private — pause them in public and save them for a calm moment alone.', fix: 'A private, calm resolution session and a renewed sanctuary promise.' },
+  12: { title: 'Reset Problem', section: 'Foundation Rules (1-12)', issue: 'We went to sleep angry or distant without resolving our issue.', todo: 'Never end a day with anger — hug it out and reset with love before bedtime.', fix: 'Same-day resolution + bedtime reset hug, always.' },
+  13: { title: 'Good Morning/Goodnight', section: 'Daily Love Habits (13-15)', issue: 'Our sweet Good Morning or Goodnight message was missed.', todo: 'Send the greeting no matter how busy — it says "you were on my mind first and last."', fix: 'Make the daily greeting non-negotiable, even one voice note counts.' },
+  14: { title: '6-Second Kiss', section: 'Daily Love Habits (13-15)', issue: 'We skipped our 6-second kiss / a hello-goodbye went without a real kiss.', todo: 'Give the full 6-second kiss at hello and goodbye — a big kiss stops a small fight before it starts.', fix: 'Restart the kiss ritual today, twice (hello + goodbye).' },
+  15: { title: 'Daily Compliment', section: 'Daily Love Habits (13-15)', issue: 'I didn\'t receive my daily genuine compliment.', todo: 'One specific, heartfelt compliment every day keeps our love glowing.', fix: 'Deliver today\'s compliment + pay the penalty: sing a love song to each other!' },
+  16: { title: 'Respect / Contempt', section: 'Quarantine & Respect (16-18)', issue: 'Name-calling, mocking, eye-rolls or contempt happened during our argument.', todo: 'Complain about the problem, never attack the person — talk respectfully.', fix: 'A respectful redo of the conversation: no insults, only feelings and facts.' },
+  17: { title: 'Breakup Threat', section: 'Quarantine & Respect (16-18)', issue: 'The word "breakup" was used as a threat or weapon during an argument.', todo: 'Keep our relationship a safe zone — that word NEVER wins a fight.', fix: 'Mutual re-promise: arguments stay about issues, never about ending us.' },
+  18: { title: 'Cooling Rule', section: 'Quarantine & Respect (16-18)', issue: 'A time-out was taken but we didn\'t return, or silent treatment replaced the 24-hour cooling rule.', todo: 'Always come back within the cooling window and finish the conversation with love.', fix: 'Schedule the promised return-talk now and resolve it fully.' },
+  19: { title: 'United Front', section: 'Us vs. The World (19-23)', issue: 'We argued, mocked, or corrected each other in front of family or friends.', todo: 'To the world we are ONE team — disagreements stay private, protect each other\'s image.', fix: 'Public unity pledge + handle any leftover disagreement privately.' },
+  20: { title: 'Screen Distraction', section: 'Us vs. The World (19-23)', issue: 'Phones won over our together-time — scrolling while the other was talking.', todo: 'Choose presence over screens — when we\'s together, the phone waits. Screens never beat dreams!', fix: 'Phone-free together-time blocks (both devices away, eyes on each other).' },
+  21: { title: 'Date Night', section: 'Us vs. The World (19-23)', issue: 'We skipped our weekly date night.', todo: 'One dedicated evening a week — dinner, movie, drive, or cozy home-date — just Deep and Honey.', fix: 'Book the next date night right now, with a plan both love.' },
+  22: { title: 'Celebrating Wins', section: 'Us vs. The World (19-23)', issue: 'One of us achieved something and it wasn\'t celebrated loudly enough.', todo: 'His win is her win, her win is his win — proud words, a hug, and something sweet required!', fix: 'Throw the overdue celebration: proud words + hug + treat.' },
+  23: { title: 'Growth Check-In', section: 'Us vs. The World (19-23)', issue: 'We missed our monthly check-in about goals, support, and happiness.', todo: 'Hold the monthly check-in: "Is there anything you need from me to feel happier or more supported?"', fix: 'Schedule the check-in this week and grow together 🌱.' },
+  all:{ title: 'Complete Review — ALL 23 Rules', section: 'Full Love Contract', issue: 'I want to discuss our commitment to ALL 23 relationship rules together.', todo: 'A full heart-to-heart covering Foundation Rules (1-12), Daily Love Habits (13-15), Quarantine & Respect (16-18), and Us vs. The World (19-23).', fix: 'One complete, loving review of every rule so our whole contract gets equal attention.' }
+};
+
+function getRuleMeta(r) {
+  const m = RULE_META[r.option] || null;
+  if (m) return m;
+  // Fallback: derive number from the value text ("✅ Rule 7 - ...")
+  const mm = r.value.match(/Rule (\d+)/i);
+  return (mm && RULE_META[mm[1]]) ? RULE_META[mm[1]] : null;
+}
+
+function getSelectedResponses() {
+  const checked = document.querySelectorAll('.response-checkbox:checked');
+  if (Array.from(checked).some(cb => cb.getAttribute('data-option') === 'all')) {
+    return ALL_RULES.map((rule, idx) => ({ option: idx + 1, value: rule }));
+  }
+  return Array.from(checked).map(cb => ({ option: cb.getAttribute('data-option'), value: cb.value }));
+}
+
+// Build the per-rule sub-selection block (Issue / What We Have To Do / How To Fix)
+// once, so both the plain-text email and the HTML email use identical details.
+function buildRuleDetails(selected) {
+  return selected.map(r => {
+    const m = getRuleMeta(r);
+    if (!m) return { num: r.option, text: r.value, meta: null };
+    return { num: r.option, text: r.value, meta: m };
+  });
+}
+
 const ALL_RULES = [
   "✅ Rule 1 - Honesty Issue: I feel there might be something not being shared openly between us. Let's talk about maintaining complete honesty in our relationship. Trust is our foundation!",
   "✅ Rule 2 - Loyalty Check: I need reassurance about our commitment and loyalty to each other. Our bond is sacred and I want to make sure we're both protecting it completely.",
@@ -357,12 +490,30 @@ const ALL_RULES = [
   "✅ Rule 23 - Growth Check-In: We missed our monthly check-in about goals, support, and happiness. Is there anything you need from me to feel happier or more supported? Let's grow together."
 ];
 
-function getSelectedResponses() {
-  const checked = document.querySelectorAll('.response-checkbox:checked');
-  if (Array.from(checked).some(cb => cb.getAttribute('data-option') === 'all')) {
-    return ALL_RULES.map((rule, idx) => ({ option: idx + 1, value: rule }));
+// Ask for recipient(s) at send time — no default mail IDs are stored.
+// Remembers what was typed for this session only (never saved permanently).
+// If a prompt UI isn't available (embedded/test browsers), fall back to the
+// "To:" field in the complaint card, then to whatever was used this session.
+function getRecipients() {
+  const stored = sessionStorage.getItem('deepNectarRecipients') || '';
+  const toField = document.getElementById('recipientEmails');
+  if (typeof prompt !== 'function') {
+    const manual = toField ? toField.value.trim() : '';
+    const val = manual || stored;
+    EMAIL_RECIPIENTS = val;
+    return val;
   }
-  return Array.from(checked).map(cb => ({ option: cb.getAttribute('data-option'), value: cb.value }));
+  const entered = prompt(
+    '📬 Enter your partner\'s email address(es):\n\nSeparate multiple addresses with commas.\n(No default mail IDs are stored in this app — you type them every time.)',
+    (toField && toField.value.trim()) || stored
+  );
+  if (entered === null) return null; // user cancelled
+  const clean = entered.split(',').map(e => e.trim()).filter(Boolean).join(',');
+  if (!clean) { alert('⚠️ Please enter at least one email address to send the complaint.'); return null; }
+  if (toField) toField.value = clean;
+  sessionStorage.setItem('deepNectarRecipients', clean);
+  EMAIL_RECIPIENTS = clean;
+  return clean;
 }
 
 function sendComplaint(target) {
@@ -374,6 +525,10 @@ function sendComplaint(target) {
   const format = document.querySelector('input[name="emailFormat"]:checked').value;
   const partner = target === 'deep' ? 'Deep 🐼' : 'Honey 🍯🐻';
   const subject = `💌 Romantic Complaint About ${partner} - ${dateStr}`;
+
+  // No default mail IDs stored — ask who should receive it (session memory only).
+  const recipients = getRecipients();
+  if (!recipients) return; // user cancelled / entered nothing
 
   if (format === 'html') {
     generateHtmlEmail(target);
@@ -393,15 +548,25 @@ function sendComplaint(target) {
 
   const greeting = target === 'deep' ? 'With all my love and hope for our future,\nFrom your Honey 🍯 Bee 🐝' : 'With all my love and hope for our future,';
   const sep = '\n\n═══════════════════════════════════════════════\n\n';
-  let body = `💌💌💌 ROMANTIC LOVE CONTRACT COMPLAINT & DISCUSSION 💌💌💌\n\n📅 Date: ${dateStr}\n⏰ Time: ${timeStr}\n💝 Regarding: Our Complete Love & Trust Rulebook (23 Rules!)\n❤️ Status: Romantic Discussion Needed\n${sep}`;
-  if (selected.length) body += `📜 SELECTED RULE CONCERNS FROM OUR LOVE CONTRACT:\n\n${selected.map(r => r.value + '\n\n').join('')}${sep}`;
+  let body = `💌💌💌 ROMANTIC LOVE CONTRACT COMPLAINT & DISCUSSION 💌💌💌\n\n📅 Date: ${dateStr}\n⏰ Time: ${timeStr}\n💝 Regarding: Our Complete Love & Trust Rulebook (23 Rules!)\n❤️ Status: Romantic Discussion Needed${sep}`;
+  if (selected.length) {
+    body += `📜 SELECTED RULE CONCERNS FROM OUR LOVE CONTRACT:\n\n`;
+    buildRuleDetails(selected).forEach((d, i) => {
+      body += `${i + 1}) ${d.text}\n`;
+      if (d.meta) {
+        body += `\n   🔍 WHAT IS THE ISSUE:\n   ${d.meta.issue}\n\n   🤝 WHAT WE HAVE TO DO:\n   ${d.meta.todo}\n\n   💖 HOW WE FIX IT:\n   ${d.meta.fix}\n`;
+      }
+      body += '\n';
+    });
+    body += sep;
+  }
   if (personalMsg) body += `💖 PERSONAL MESSAGE & DEEP FEELINGS:\n\n${personalMsg}\n\n${sep}`;
   body += `I'm bringing this up because our relationship means everything to me 💕\nI believe in our rules and our promise to each other 🤝\n\nLet's talk about this with love, understanding, and patience 💭\nOur bond is worth protecting and strengthening every day 💪❤️\n\n${greeting}${DEEP_BRANDING}\n\n${sep}💖 OUR ETERNAL SOULMATE CODE: DeepNectar 💖\n\n"A love so deep, it turns into honey."\n\nThis code represents our eternal connection - a love so deep, it becomes the sweetest honey.\nNo matter what we discuss or work through, remember we are DeepNectar forever. 🐼❤️🐻\n\n💌❤️💌❤️💌❤️💌❤️💌`;
 
   if (isMobileDevice()) {
-    window.location.href = `mailto:${EMAIL_RECIPIENTS}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = `mailto:${recipients}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   } else {
-    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(EMAIL_RECIPIENTS)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&ui=2&tf=1`;
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(recipients)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}&ui=2&tf=1`;
     window.open(gmailUrl, '_blank', 'noopener,noreferrer,width=800,height=600');
   }
   setTimeout(() => {
