@@ -321,6 +321,11 @@ span[class*="password-reveal"] { display: none !important; }
 .html-email-preview .preview-note { margin-top: 12px; padding: 10px 12px; background: rgba(255,51,102,.1); border-radius: 8px; border-left: 4px solid #ff3366; color: #ff99cc; font-size: 12.5px; line-height: 1.6; }
 .html-email-preview .preview-note strong { color: #ff6699; }
 .html-email-preview .subject-line { color: #ff6699; font-weight: bold; }
+/* Subject row — copied together with the HTML so it can be pasted manually */
+.subject-copy-row { margin-bottom: 12px; }
+.subject-copy-label { display: block; font-size: 12.5px; color: #ff99cc; margin-bottom: 6px; line-height: 1.5; }
+#htmlSubjectInput { width: 100%; box-sizing: border-box; background: #1a0d14; color: #ffd6e5; border: 2px solid #ff3366; border-radius: 10px; padding: 10px 12px; font-family: 'Courier New', monospace; font-size: 13.5px; font-weight: bold; }
+#htmlSubjectInput:focus { outline: none; border-color: #ff99cc; }
 
 /* ---------- Signature section ---------- */
 .signature-section { margin: 28px 0 20px; padding: 16px 14px; border-radius: 18px; border: 3px solid #ff99aa; text-align: center; box-shadow: 0 10px 28px rgba(255,153,170,.22); box-sizing: border-box; max-width: 100%; }
