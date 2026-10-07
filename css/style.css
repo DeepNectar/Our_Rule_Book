@@ -482,6 +482,25 @@ span[class*="password-reveal"] { display: none !important; }
   }
   .email-container, .section, .soulmate-section, .response-system-container,
   .promise-box, .header, .footer { text-shadow: 0 1px 4px rgba(255,255,255,.9); }
+
+  /* ===== PHONE SPEED BOOST ===== */
+  /* No per-frame repaint-expensive effects on touch devices.            */
+  /* The infinite romanticHeartbeat / gentleGlow animations used to make  */
+  /* dozens of elements re-rasterize every frame — the main cause of the  */
+  /* sluggish scrolling on phones. They now run only on desktop.          */
+  *, *::before, *::after { animation-iteration-count: 1 !important; }
+  .floating-emoji, .nectar-bee { will-change: auto; text-shadow: none; }
+  .ultra-romantic-bg { contain: strict; }
+  .email-container, .section, .promise-box, .soulmate-section,
+  .response-system-container, .signature-section, .header, .footer,
+  .contract-title, .intro-text, .deepnectar-box, .deepnectar-middle,
+  .html-email-preview, .message-box, .email-list, .special-note,
+  .rule-content, .response-option, .password-box { box-shadow: none; }
+}
+
+/* Phone & touch: bigger soulmate photo, fills most of the card width */
+@media only screen and (max-width: 768px), (hover: none) and (pointer: coarse) {
+  .soulmate-image-container { width: min(70vw, 320px); height: min(70vw, 320px); }
 }
 
 /* Small phone (<=480px) */
@@ -530,6 +549,8 @@ span[class*="password-reveal"] { display: none !important; }
   .deepnectar-middle { font-size: 12px; padding: 4px 8px; }
   .deepnectar-text { font-size: 11px; white-space: normal; }
   .nectar-swarm { height: 28px; }
+  /* Soulmate photo bigger on phones — fills the card width (was a tiny fixed box) */
+  .soulmate-image-container { width: min(72vw, 300px); height: min(72vw, 300px); }
   .password-box { padding: 22px 14px; width: 94%; }
   .password-title { font-size: 19px; }
   .password-subtitle { font-size: 13px; }
@@ -553,6 +574,8 @@ span[class*="password-reveal"] { display: none !important; }
   .seal { font-size: 18px; }
   .soulmate-code { font-size: 21px; }
   :root { --seal-size: 96px; --stamp-size: 66px; --kiss-size: 80px; }
+  /* Soulmate photo stays big even on tiny phones */
+  .soulmate-image-container { width: min(78vw, 280px); height: min(78vw, 280px); }
   .stamp-seal { border-width: 2px; padding: 4px; }
   .password-title { font-size: 17px; }
   .password-input { font-size: 14px; }

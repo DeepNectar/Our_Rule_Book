@@ -19,6 +19,7 @@ function unlockPage() {
   initFloatingEmojis();
   warmBrandCache();
   createNectarSwarm();
+  refreshSoulmateImage();
 }
 
 function checkPassword() {
@@ -235,8 +236,10 @@ function getDevicePerformanceProfile() {
   const deviceType = getDeviceType();
   const conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
   const isSlowConnection = !!(conn && (conn.effectiveType === '2g' || conn.effectiveType === 'slow-2g'));
-  // Fewer, smaller hearts on phones/tablets → smooth 60fps everywhere.
-  const emojiCount = deviceType === 'desktop' ? 45 : deviceType === 'tablet' ? 28 : isSlowConnection ? 14 : 18;
+  // PHONE SPEED BOOST: far fewer, GPU-cheap hearts on phones/tablets so
+  // scrolling stays smooth. Infinite animations are also disabled in CSS on
+  // touch devices (see "PHONE SPEED BOOST" in css/style.css).
+  const emojiCount = deviceType === 'desktop' ? 45 : deviceType === 'tablet' ? 16 : isSlowConnection ? 8 : 10;
   return {
     deviceType, isSlowConnection, emojiCount,
     minSize: deviceType === 'desktop' ? 12 : 10,
@@ -266,7 +269,10 @@ function cycleSpeed() {
 }
 function startSpeedCycling(p) {
   if (speedCycleInterval) clearInterval(speedCycleInterval);
-  speedCycleInterval = setInterval(() => { if (!document.hidden) cycleSpeed(); }, p ? p.speedCycleInterval : 12000);
+  // PHONE SPEED BOOST: no cycling timer at all on touch-sized screens.
+  if (getDeviceType() === 'desktop') {
+    speedCycleInterval = setInterval(() => { if (!document.hidden) cycleSpeed(); }, p ? p.speedCycleInterval : 12000);
+  }
 }
 
 function createFloatingEmojis() {
@@ -274,6 +280,9 @@ function createFloatingEmojis() {
   if (!bg) return null;
   const p = getDevicePerformanceProfile();
   bg.innerHTML = '';
+  // PHONE SPEED BOOST: phones get a small, cheap batch of hearts (no glow
+  // shadows, no will-change — see the CSS "PHONE SPEED BOOST" block), while
+  // tablets/desktops keep the full romantic layer.
   const frag = document.createDocumentFragment();
   for (let i = 0; i < p.emojiCount; i++) {
     const el = document.createElement('div');
@@ -289,7 +298,10 @@ function createFloatingEmojis() {
     el.style.fontSize = (Math.random() * (p.maxSize - p.minSize) + p.minSize) + 'px';
     el.style.animationDelay = Math.random() * 10 + 's';
     el.style.color = COLOR_PALETTE[Math.floor(Math.random() * COLOR_PALETTE.length)];
-    el.style.textShadow = `0 0 ${Math.random() * 12 + 5}px currentColor`;
+    // Glow text-shadows re-rasterize every frame — very costly on phones.
+    if (p.deviceType === 'desktop') {
+      el.style.textShadow = `0 0 ${Math.random() * 12 + 5}px currentColor`;
+    }
     frag.appendChild(el);
   }
   bg.appendChild(frag);
@@ -410,6 +422,14 @@ function imageFailed() {
   const ph = document.getElementById('imagePlaceholder');
   if (img) img.style.display = 'none';
   if (ph) ph.style.display = 'flex';
+}
+// The soulmate photo lives inside the hidden main content, so its onload can
+// fire before the page is revealed on some mobile browsers. Re-check after
+// unlocking so the big photo always shows (and never gets stuck as placeholder).
+function refreshSoulmateImage() {
+  const img = document.getElementById('soulmateImage');
+  if (!img) return;
+  if (img.complete) { img.naturalHeight ? imageLoaded() : imageFailed(); }
 }
 
 // ==================== Startup wiring ====================
